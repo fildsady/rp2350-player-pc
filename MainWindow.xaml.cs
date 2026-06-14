@@ -37,10 +37,13 @@ public partial class MainWindow : Window
         Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "hotkeys.json");
     private static readonly string LastPortFile =
         Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "lastport.txt");
+    private static readonly string WindowStateFile =
+        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "windowstate.json");
 
     public MainWindow()
     {
         InitializeComponent();
+        RestoreWindowState();
         BuildHotkeySlots();
         LoadHotkeys();
         BuildEqSliders();
@@ -511,8 +514,41 @@ public partial class MainWindow : Window
 
     private void BtnClearLog_Click(object sender, RoutedEventArgs e) => TbLog.Text = "";
 
+    private void RestoreWindowState()
+    {
+        try
+        {
+            if (!File.Exists(WindowStateFile)) return;
+            var json = File.ReadAllText(WindowStateFile);
+            var doc  = JsonDocument.Parse(json).RootElement;
+            Width        = doc.GetProperty("w").GetDouble();
+            Height       = doc.GetProperty("h").GetDouble();
+            Left         = doc.GetProperty("x").GetDouble();
+            Top          = doc.GetProperty("y").GetDouble();
+            WindowState  = doc.GetProperty("maximized").GetBoolean()
+                           ? WindowState.Maximized : WindowState.Normal;
+        }
+        catch { }
+    }
+
+    private void SaveWindowState()
+    {
+        try
+        {
+            var s = WindowState;
+            var w = s == WindowState.Maximized ? RestoreBounds.Width  : Width;
+            var h = s == WindowState.Maximized ? RestoreBounds.Height : Height;
+            var x = s == WindowState.Maximized ? RestoreBounds.Left   : Left;
+            var y = s == WindowState.Maximized ? RestoreBounds.Top    : Top;
+            var json = $"{{\"w\":{w},\"h\":{h},\"x\":{x},\"y\":{y},\"maximized\":{(s == WindowState.Maximized ? "true" : "false")}}}";
+            File.WriteAllText(WindowStateFile, json);
+        }
+        catch { }
+    }
+
     protected override void OnClosed(EventArgs e)
     {
+        SaveWindowState();
         _clockTimer.Stop();
         _beatTimer.Stop();
         _serial.Dispose();
