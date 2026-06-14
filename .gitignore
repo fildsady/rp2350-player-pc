@@ -1,0 +1,6 @@
+bin/
+obj/
+publish/
+installer_output/
+*.user
+.vs/
