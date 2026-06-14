@@ -710,6 +710,188 @@
                 </Grid>
             </TabItem>
 
+            <!-- ════════════════════════════════════════════════════════════════
+                 PAGE 3 — Help
+                 ════════════════════════════════════════════════════════════════ -->
+            <TabItem Header="❓  Help">
+                <ScrollViewer Background="#1e1e2e" VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled" Padding="16,12,16,16">
+                    <ScrollViewer.Resources>
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource DarkScrollBar}"/>
+                    </ScrollViewer.Resources>
+                    <StackPanel>
+
+                        <!-- Title -->
+                        <TextBlock Text="RP2350 Player — คู่มือการใช้งาน"
+                                   Foreground="#cdd6f4" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
+
+                        <!-- ── Connection ── -->
+                        <TextBlock Text="การเชื่อมต่อ" Foreground="#89b4fa" FontSize="13" FontWeight="Bold" Margin="0,0,0,6"/>
+                        <TextBlock TextWrapping="Wrap" Foreground="#a6adc8" FontSize="12" Margin="0,0,0,4">
+                            1. เสียบ Pico 2 ผ่าน USB&#10;2. เลือก COM port จาก dropdown ด้านบน&#10;3. คลิก Connect — สถานะจะเปลี่ยนเป็นสีเขียวเมื่อเชื่อมต่อสำเร็จ
+                        </TextBlock>
+
+                        <Rectangle Height="1" Fill="#313244" Margin="0,12,0,12"/>
+
+                        <!-- ── Player ── -->
+                        <TextBlock Text="แท็บ Player" Foreground="#89b4fa" FontSize="13" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
+                                <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <!-- headers -->
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="ปุ่ม / ช่อง" Foreground="#585b70" FontSize="11" FontFamily="Consolas" Margin="0,0,0,4"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="หน้าที่"     Foreground="#585b70" FontSize="11" FontFamily="Consolas" Margin="8,0,0,4"/>
+                            <!-- rows -->
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Play"        Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="เล่น / ยกเลิก pause" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Pause"       Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="หยุดชั่วคราว" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Stop"        Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="หยุด" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="◀ Prev / Next ▶" Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="เพลงก่อนหน้า / ถัดไป" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Volume slider" Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="ระดับเสียง 0–100 (บันทึกลง SD อัตโนมัติ)" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="6" Grid.Column="0" Text="Mono"        Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="6" Grid.Column="1" Text="สลับโหมด mono / stereo" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="7" Grid.Column="0" Text="Track list"  Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="7" Grid.Column="1" Text="ดับเบิลคลิกเพื่อกระโดดไปยัง track นั้น" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0"/>
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="#313244" Margin="0,12,0,12"/>
+
+                        <!-- ── EQ ── -->
+                        <TextBlock Text="แท็บ EQ" Foreground="#89b4fa" FontSize="13" FontWeight="Bold" Margin="0,0,0,6"/>
+                        <TextBlock TextWrapping="Wrap" Foreground="#cdd6f4" FontSize="12" Margin="0,0,0,4">
+                            EQ 32 band — ปรับ slider แต่ละ band ได้ตั้งแต่ −12 dB ถึง +12 dB
+                        </TextBlock>
+                        <Grid Margin="0,4,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/><RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="ปรับ slider"    Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="ส่งคำสั่ง eq band ไปยัง Pico ทันที และ sync กลับเมื่อเชื่อมต่อ" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Reset"          Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="คืน EQ ทุก band เป็น flat (0 dB)" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0"/>
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="#313244" Margin="0,12,0,12"/>
+
+                        <!-- ── Schedule ── -->
+                        <TextBlock Text="แท็บ Schedule" Foreground="#89b4fa" FontSize="13" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <TextBlock TextWrapping="Wrap" Foreground="#cdd6f4" FontSize="12" Margin="0,0,0,8">
+                            ตั้งให้ Pico เล่นเพลงอัตโนมัติตามวันและเวลาที่กำหนด
+                        </TextBlock>
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
+                                <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="ช่อง"          Foreground="#585b70" FontSize="11" FontFamily="Consolas" Margin="0,0,0,4"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="รายละเอียด"    Foreground="#585b70" FontSize="11" FontFamily="Consolas" Margin="8,0,0,4"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="✓ (checkbox)"  Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="เปิด/ปิด entry นี้" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Start"          Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="เวลาเริ่มเล่น (HH MM สองช่องแยก)" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Stop"           Foreground="#f38ba8" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="เวลาหยุด — ว่างไว้หากไม่ต้องการ" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Tracks"         Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" TextWrapping="Wrap" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0">
+                                ชื่อไฟล์คั่นด้วย comma ไม่ต้องใส่นามสกุล&#10;ตัวอย่าง: <Run Foreground="#fab387">song1,jazz2,bgm</Run>
+                            </TextBlock>
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Loops"          Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="จำนวนรอบ playlist  (0 = วนไม่รู้จบ)" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="6" Grid.Column="0" Text="Days"            Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="6" Grid.Column="1" Text="เลือกวันที่จะเล่น จันทร์–อาทิตย์" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="7" Grid.Column="0" Text="🗑 (ลบ)"         Foreground="#a6e3a1" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Grid.Row="7" Grid.Column="1" Text="ลบ entry แถวนั้น" Foreground="#cdd6f4" FontSize="12" Margin="8,0,0,0"/>
+                        </Grid>
+                        <TextBlock TextWrapping="Wrap" Foreground="#a6adc8" FontSize="12" Margin="0,0,0,4">
+                            <Run FontWeight="Bold" Foreground="#cdd6f4">Send → Pico</Run>  ส่ง schedule ทั้งหมดไปบันทึกลง SD card ของ Pico&#10;<Run FontWeight="Bold" Foreground="#cdd6f4">Pull ← Pico</Run>  ดึง schedule จาก SD card ของ Pico มาแสดงใน GUI&#10;<Run FontWeight="Bold" Foreground="#cdd6f4">Save File</Run>    บันทึก schedule เป็นไฟล์ .json ลงเครื่อง PC&#10;<Run FontWeight="Bold" Foreground="#cdd6f4">Load File</Run>    โหลดไฟล์ .json กลับมาแสดงใน GUI
+                        </TextBlock>
+
+                        <Rectangle Height="1" Fill="#313244" Margin="0,12,0,12"/>
+
+                        <!-- ── Serial Commands ── -->
+                        <TextBlock Text="Serial Commands (อ้างอิง)" Foreground="#89b4fa" FontSize="13" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <TextBlock TextWrapping="Wrap" Foreground="#a6adc8" FontSize="11" Margin="0,0,0,6">
+                            สามารถส่งคำสั่งโดยตรงจากช่อง Serial Console ด้านล่างซ้าย
+                        </TextBlock>
+
+                        <!-- Command table -->
+                        <Border Background="#181825" CornerRadius="6" Padding="12,10" Margin="0,0,0,4">
+                            <StackPanel>
+                                <TextBlock Text="Playback" Foreground="#6c7086" FontSize="11" Margin="0,0,0,6"/>
+                                <TextBlock FontFamily="Consolas" FontSize="12" Foreground="#cdd6f4" TextWrapping="Wrap">
+                                    <Run Foreground="#a6e3a1">play</Run>  /  <Run Foreground="#a6e3a1">pause</Run>  /  <Run Foreground="#a6e3a1">stop</Run>  /  <Run Foreground="#a6e3a1">next</Run>  /  <Run Foreground="#a6e3a1">prev</Run>&#10;<Run Foreground="#a6e3a1">goto</Run> <Run Foreground="#fab387">&lt;trackname&gt;</Run>    — กระโดดไปยัง track (ไม่ต้องใส่นามสกุล)&#10;<Run Foreground="#a6e3a1">status</Run>            — แสดงสถานะปัจจุบัน&#10;<Run Foreground="#a6e3a1">version</Run>           — แสดง firmware version
+                                </TextBlock>
+
+                                <TextBlock Text="Volume &amp; EQ" Foreground="#6c7086" FontSize="11" Margin="0,12,0,6"/>
+                                <TextBlock FontFamily="Consolas" FontSize="12" Foreground="#cdd6f4" TextWrapping="Wrap">
+                                    <Run Foreground="#a6e3a1">volume</Run> <Run Foreground="#fab387">&lt;0-100&gt;</Run>&#10;<Run Foreground="#a6e3a1">eq band</Run> <Run Foreground="#fab387">&lt;0-31&gt; &lt;-12..12&gt;</Run>&#10;<Run Foreground="#a6e3a1">eq reset</Run>&#10;<Run Foreground="#a6e3a1">mono on</Run>|<Run Foreground="#a6e3a1">off</Run>
+                                </TextBlock>
+
+                                <TextBlock Text="Repeat Mode" Foreground="#6c7086" FontSize="11" Margin="0,12,0,6"/>
+                                <TextBlock FontFamily="Consolas" FontSize="12" Foreground="#cdd6f4" TextWrapping="Wrap">
+                                    <Run Foreground="#a6e3a1">mode repeat_one</Run>      — วนซ้ำ track เดิม&#10;<Run Foreground="#a6e3a1">mode repeat_all</Run>      — วนทุก track&#10;<Run Foreground="#a6e3a1">mode repeat_off</Run>      — ไม่วน&#10;<Run Foreground="#a6e3a1">mode repeat_single</Run>   — เล่น track เดียวแล้วหยุด&#10;<Run Foreground="#a6e3a1">mode autoplay_on</Run>|<Run Foreground="#a6e3a1">off</Run>  — เล่นอัตโนมัติตอน boot
+                                </TextBlock>
+
+                                <TextBlock Text="Date / Time" Foreground="#6c7086" FontSize="11" Margin="0,12,0,6"/>
+                                <TextBlock FontFamily="Consolas" FontSize="12" Foreground="#cdd6f4" TextWrapping="Wrap">
+                                    <Run Foreground="#a6e3a1">date</Run> <Run Foreground="#fab387">YYYY-MM-DD HH:MM:SS</Run>&#10;<Run Foreground="#a6e3a1">time</Run> <Run Foreground="#fab387">HH:MM:SS</Run>
+                                </TextBlock>
+
+                                <TextBlock Text="Scheduler" Foreground="#6c7086" FontSize="11" Margin="0,12,0,6"/>
+                                <TextBlock FontFamily="Consolas" FontSize="12" Foreground="#cdd6f4" TextWrapping="Wrap">
+                                    <Run Foreground="#a6e3a1">sched list</Run>&#10;<Run Foreground="#a6e3a1">sched clear</Run>&#10;<Run Foreground="#a6e3a1">sched save</Run>&#10;<Run Foreground="#a6e3a1">sched add</Run> <Run Foreground="#fab387">time=HH:MM [stop=HH:MM] tracks=n1,n2 [loops=N] [days=1111111] [enabled=1]</Run>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <Rectangle Height="1" Fill="#313244" Margin="0,12,0,12"/>
+
+                        <!-- ── Tips ── -->
+                        <TextBlock Text="เคล็ดลับ" Foreground="#89b4fa" FontSize="13" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <StackPanel>
+                            <TextBlock TextWrapping="Wrap" Foreground="#a6adc8" FontSize="12" Margin="0,0,0,5">
+                                • ชื่อไฟล์ใน Tracks ไม่ต้องใส่นามสกุล (.mp3/.wav/.flac) และไม่ต้องสนใจตัวพิมพ์เล็ก-ใหญ่
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Foreground="#a6adc8" FontSize="12" Margin="0,0,0,5">
+                                • loops = 0 คือวนไม่รู้จบจนกว่าถึงเวลา Stop หรือกด Stop เอง
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Foreground="#a6adc8" FontSize="12" Margin="0,0,0,5">
+                                • 1 loop นับเป็น 1 รอบของ playlist ทั้งหมด ไม่ใช่ 1 เพลง
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Foreground="#a6adc8" FontSize="12" Margin="0,0,0,5">
+                                • ไฟล์ schedule บน Pico อยู่ที่ <Run FontFamily="Consolas" Foreground="#fab387">0:/config/schedule.txt</Run>
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Foreground="#a6adc8" FontSize="12" Margin="0,0,0,5">
+                                • ค่า EQ และ volume บันทึกลง SD อัตโนมัติเมื่อเปลี่ยน
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Foreground="#a6adc8" FontSize="12" Margin="0,0,0,5">
+                                • ถ้า port ไม่ขึ้น ให้กด Refresh หรือถอด-เสียบ USB ใหม่
+                            </TextBlock>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
         </TabControl>
 
         <!-- Hotkey panel -->
