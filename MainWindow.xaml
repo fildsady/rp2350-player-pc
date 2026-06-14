@@ -1,7 +1,7 @@
 ﻿<Window x:Class="RP2350Player.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="RP2350 Player  v1.0" Icon="/RP2350Player;component/app.ico" Height="750" Width="880"
+        Title="RP2350 Player  v1.0" Icon="/RP2350Player;component/app.ico" Height="750" Width="1280"
         Background="#1e1e2e" Foreground="White"
         ResizeMode="CanMinimize">
 

@@ -328,10 +328,10 @@ public partial class MainWindow : Window
         for (int i = 0; i < EqBands; i++)
         {
             int idx = i;
-            var sp = new StackPanel { Width = 32, HorizontalAlignment = HorizontalAlignment.Center };
+            var sp = new StackPanel { Width = 48, HorizontalAlignment = HorizontalAlignment.Center };
 
             var dbLbl = new TextBlock {
-                Text = " 0.0", FontFamily = new FontFamily("Consolas"), FontSize = 9,
+                Text = " 0.0", FontFamily = new FontFamily("Consolas"), FontSize = 10,
                 Foreground = new SolidColorBrush(Color.FromRgb(0x89, 0xb4, 0xfa)),
                 HorizontalAlignment = HorizontalAlignment.Center
             };
@@ -354,7 +354,7 @@ public partial class MainWindow : Window
             var freqLbl = new TextBlock {
                 Text = FreqLabel(EqFreqs[idx]),
                 Foreground = new SolidColorBrush(Color.FromRgb(0xa6, 0xad, 0xc8)),
-                FontSize = 9, HorizontalAlignment = HorizontalAlignment.Center,
+                FontSize = 10, HorizontalAlignment = HorizontalAlignment.Center,
                 Margin = new Thickness(0, 2, 0, 0)
             };
 
