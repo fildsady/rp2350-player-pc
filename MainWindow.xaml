@@ -6,32 +6,59 @@
         ResizeMode="CanResizeWithGrip">
 
     <Window.Resources>
+        <!-- ── Base console button ─────────────────────────────────────────── -->
         <Style x:Key="DarkBtn" TargetType="Button">
-            <Setter Property="Background"      Value="#313244"/>
-            <Setter Property="Foreground"      Value="White"/>
-            <Setter Property="BorderBrush"     Value="#45475a"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#2c2c44" Offset="0"/>
+                        <GradientStop Color="#18182a" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground"      Value="#c0c8e8"/>
+            <Setter Property="BorderBrush"     Value="#383858"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding"         Value="12,6"/>
-            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="Padding"         Value="12,7"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="FontFamily"      Value="Consolas"/>
             <Setter Property="Cursor"          Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4" Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                CornerRadius="3" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#45475a"/>
+                                <Setter TargetName="Bd" Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#3a3a56" Offset="0"/>
+                                            <GradientStop Color="#22223a" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4e4e72"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#585b70"/>
+                                <Setter TargetName="Bd" Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#10101e" Offset="0"/>
+                                            <GradientStop Color="#20203a" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#2a2a44"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.4"/>
+                                <Setter Property="Opacity" Value="0.32"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -39,15 +66,255 @@
             </Setter>
         </Style>
 
-        <Style x:Key="AccentBtn" TargetType="Button" BasedOn="{StaticResource DarkBtn}">
-            <Setter Property="Background" Value="#89b4fa"/>
-            <Setter Property="Foreground" Value="#1e1e2e"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#b4befe"/>
-                </Trigger>
-            </Style.Triggers>
+        <!-- ── Connect / accent button ────────────────────────────────────── -->
+        <Style x:Key="AccentBtn" TargetType="Button">
+            <Setter Property="Background"      Value="#14305a"/>
+            <Setter Property="Foreground"      Value="#7ab4f8"/>
+            <Setter Property="BorderBrush"     Value="#3a6aaa"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding"         Value="12,7"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="FontFamily"      Value="Consolas"/>
+            <Setter Property="FontWeight"      Value="Bold"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#1a3e70"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#5a90d8"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#0c2040"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.32"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── Hotkey play button ─────────────────────────────────────────── -->
+        <Style x:Key="HkPlayBtn" TargetType="Button">
+            <Setter Property="Background"      Value="#0a1e0a"/>
+            <Setter Property="Foreground"      Value="#5acc5a"/>
+            <Setter Property="BorderBrush"     Value="#1e4a1e"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding"         Value="0"/>
+            <Setter Property="FontSize"        Value="11"/>
+            <Setter Property="FontFamily"      Value="Consolas"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="2" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#0f2e0f"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#2e6a2e"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#060e06"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.32"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── Dark scrollbar (Serial Log) ──────────────────────────────────── -->
+        <Style x:Key="DarkScrollThumb" TargetType="Thumb">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border x:Name="Bd" Background="#383858" CornerRadius="3"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#4e4e72"/>
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#7aa2f7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DarkScrollBar" TargetType="ScrollBar">
+            <Setter Property="Width"       Value="6"/>
+            <Setter Property="Background"  Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="Transparent" Width="6">
+                            <Border Background="#14141e" CornerRadius="3" Margin="2,4"/>
+                            <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="False"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource DarkScrollThumb}" MinHeight="20"/>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="False"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── AV Fader — Vertical (EQ bands) ──────────────────────────────── -->
+        <Style x:Key="AVFaderV" TargetType="Slider">
+            <Setter Property="Orientation" Value="Vertical"/>
+            <Setter Property="Focusable"   Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid HorizontalAlignment="Center">
+                            <Border Width="3" Background="#1a1a2e" CornerRadius="1"
+                                    VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
+                            <Rectangle Width="9" Height="1" Fill="#3a3a5a"
+                                       VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Track x:Name="PART_Track">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}" Focusable="False">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Width="3" Background="#3d5a99" HorizontalAlignment="Center"
+                                                        CornerRadius="0,0,1,1"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb x:Name="Thumb" Focusable="False">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border x:Name="Cap" Width="22" Height="10" CornerRadius="2"
+                                                        Background="#7aa2f7" BorderBrush="#4a72c7" BorderThickness="1">
+                                                    <Rectangle Width="13" Height="1" Fill="#0d1430"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Cap" Property="Background" Value="#a0bfff"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsDragging" Value="True">
+                                                        <Setter TargetName="Cap" Property="Background" Value="#c0d8ff"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.IncreaseLarge}" Focusable="False">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Width="3" Background="Transparent" HorizontalAlignment="Center"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.35"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── AV Fader — Horizontal (Volume) ──────────────────────────────── -->
+        <Style x:Key="AVFaderH" TargetType="Slider">
+            <Setter Property="Orientation" Value="Horizontal"/>
+            <Setter Property="Focusable"   Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid VerticalAlignment="Center">
+                            <Border Height="3" Background="#1a1a2e" CornerRadius="1"
+                                    VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                            <Track x:Name="PART_Track">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}" Focusable="False">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Height="3" Background="#7aa2f7" VerticalAlignment="Center"
+                                                        CornerRadius="1,0,0,1"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb x:Name="Thumb" Focusable="False">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border x:Name="Cap" Width="11" Height="22" CornerRadius="2"
+                                                        Background="#7aa2f7" BorderBrush="#4a72c7" BorderThickness="1">
+                                                    <Rectangle Width="1" Height="12" Fill="#0d1430"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Cap" Property="Background" Value="#a0bfff"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsDragging" Value="True">
+                                                        <Setter TargetName="Cap" Property="Background" Value="#c0d8ff"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.IncreaseLarge}" Focusable="False">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Height="3" Background="#252535" VerticalAlignment="Center"
+                                                        CornerRadius="0,1,1,0"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.35"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
 
@@ -174,8 +441,32 @@
                 <TextBlock Grid.Column="4" x:Name="TbFirmware" Text=""
                            Foreground="#6c7086" FontSize="11" FontFamily="Consolas"
                            HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0"/>
+                <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Button x:Name="BtnSendFile" Content="📤 Send File"
+                            Style="{StaticResource DarkBtn}" Padding="10,5" FontSize="12"
+                            IsEnabled="False" Click="BtnSendFile_Click"/>
+                </StackPanel>
                 <Ellipse   Grid.Column="5" x:Name="StatusDot" Width="12" Height="12"
                            Fill="#f38ba8" Margin="12,0,0,0" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Upload progress (hidden when idle) -->
+        <Border Grid.Row="0" x:Name="UploadPanel" Visibility="Collapsed" VerticalAlignment="Bottom"
+                Background="#1e1e3e" CornerRadius="0,0,6,6" Padding="12,6" Margin="0,0,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="56"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" x:Name="UploadLabel" Text="📤"
+                           Foreground="#cdd6f4" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12"/>
+                <ProgressBar Grid.Column="1" x:Name="UploadBar" Height="14" Minimum="0" Maximum="100"
+                             Background="#313244" Foreground="#89b4fa" BorderThickness="0"/>
+                <TextBlock Grid.Column="2" x:Name="UploadPct" Text="0%"
+                           Foreground="#cdd6f4" VerticalAlignment="Center" HorizontalAlignment="Right"
+                           FontFamily="Consolas" FontSize="11"/>
             </Grid>
         </Border>
 
@@ -196,11 +487,11 @@
                                Foreground="#6c7086" VerticalAlignment="Center" Margin="10,0,0,0"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button x:Name="BtnPrev"  Content="⏮  Prev"  Style="{StaticResource DarkBtn}"  Width="90" Margin="4,0" IsEnabled="False" Click="BtnPrev_Click"/>
-                    <Button x:Name="BtnPlay"  Content="▶  Play"  Style="{StaticResource AccentBtn}" Width="90" Margin="4,0" IsEnabled="False" Click="BtnPlay_Click"/>
-                    <Button x:Name="BtnPause" Content="⏸  Pause" Style="{StaticResource DarkBtn}"  Width="90" Margin="4,0" IsEnabled="False" Click="BtnPause_Click"/>
-                    <Button x:Name="BtnStop"  Content="⏹  Stop"  Style="{StaticResource DarkBtn}"  Width="90" Margin="4,0" IsEnabled="False" Click="BtnStop_Click"/>
-                    <Button x:Name="BtnNext"  Content="Next  ⏭" Style="{StaticResource DarkBtn}"  Width="90" Margin="4,0" IsEnabled="False" Click="BtnNext_Click"/>
+                    <Button x:Name="BtnPrev"  Content="⏮  PREV"  Style="{StaticResource DarkBtn}"  Foreground="#7aaaee" Width="90" Margin="4,0" IsEnabled="False" Click="BtnPrev_Click"/>
+                    <Button x:Name="BtnPlay"  Content="▶  PLAY"  Style="{StaticResource DarkBtn}"  Foreground="#5acc5a" Width="90" Margin="4,0" IsEnabled="False" Click="BtnPlay_Click"/>
+                    <Button x:Name="BtnPause" Content="⏸  PAUSE" Style="{StaticResource DarkBtn}"  Foreground="#ccaa40" Width="90" Margin="4,0" IsEnabled="False" Click="BtnPause_Click"/>
+                    <Button x:Name="BtnStop"  Content="⏹  STOP"  Style="{StaticResource DarkBtn}"  Foreground="#cc5a5a" Width="90" Margin="4,0" IsEnabled="False" Click="BtnStop_Click"/>
+                    <Button x:Name="BtnNext"  Content="NEXT  ⏭" Style="{StaticResource DarkBtn}"  Foreground="#7aaaee" Width="90" Margin="4,0" IsEnabled="False" Click="BtnNext_Click"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
                     <TextBlock Text="Go to:" VerticalAlignment="Center" Foreground="#a6adc8" Margin="0,0,8,0"/>
@@ -225,7 +516,8 @@
                         <TextBlock Text="Repeat:" VerticalAlignment="Center" Foreground="#a6adc8" Width="60"/>
                         <Button x:Name="BtnRepeatOne" Content="⟳  One"  Style="{StaticResource DarkBtn}" Width="90" Margin="0,0,6,0" IsEnabled="False" Click="BtnRepeatOne_Click"/>
                         <Button x:Name="BtnRepeatAll" Content="⟳  All"  Style="{StaticResource DarkBtn}" Width="90" Margin="0,0,6,0" IsEnabled="False" Click="BtnRepeatAll_Click"/>
-                        <Button x:Name="BtnRepeatOff" Content="✕  Off"  Style="{StaticResource DarkBtn}" Width="90" Margin="0,0,0,0" IsEnabled="False" Click="BtnRepeatOff_Click"/>
+                        <Button x:Name="BtnRepeatOff"    Content="✕  Off"    Style="{StaticResource DarkBtn}" Width="90" Margin="0,0,6,0" IsEnabled="False" Click="BtnRepeatOff_Click"/>
+                        <Button x:Name="BtnRepeatSingle" Content="1️⃣ Single" Style="{StaticResource DarkBtn}" Width="90" Margin="0,0,0,0" IsEnabled="False" Click="BtnRepeatSingle_Click"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="AutoPlay:" VerticalAlignment="Center" Foreground="#a6adc8" Width="60"/>
@@ -260,7 +552,8 @@
                 <!-- Volume -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
                     <TextBlock Text="Vol:" Foreground="#a6adc8" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                    <Slider x:Name="SlVolume" Minimum="0" Maximum="100" Value="80" Width="120"
+                    <Slider x:Name="SlVolume" Minimum="0" Maximum="100" Value="80" Width="140"
+                            Style="{StaticResource AVFaderH}"
                             VerticalAlignment="Center" IsEnabled="False"
                             ValueChanged="SlVolume_ValueChanged"/>
                     <TextBlock x:Name="TbVolume" Text="80%" Foreground="#cdd6f4" FontFamily="Consolas"
@@ -311,10 +604,17 @@
                     <Button x:Name="BtnClearLog" Content="Clear" Style="{StaticResource DarkBtn}"
                             FontSize="10" Padding="6,2" Margin="8,0,0,0" Click="BtnClearLog_Click"/>
                 </StackPanel>
-                <ScrollViewer Grid.Row="1" x:Name="LogScroll" VerticalScrollBarVisibility="Auto">
-                    <TextBlock x:Name="TbLog" FontFamily="Consolas" FontSize="11"
-                               Foreground="#cdd6f4" Padding="8,4" TextWrapping="Wrap"/>
-                </ScrollViewer>
+                <TextBox x:Name="TbLog" Grid.Row="1"
+                         FontFamily="Consolas" FontSize="11"
+                         Foreground="#cdd6f4" Background="Transparent"
+                         BorderThickness="0" Padding="8,4"
+                         TextWrapping="Wrap" IsReadOnly="True"
+                         VerticalScrollBarVisibility="Auto"
+                         AcceptsReturn="True" Cursor="IBeam">
+                    <TextBox.Resources>
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource DarkScrollBar}"/>
+                    </TextBox.Resources>
+                </TextBox>
             </Grid>
         </Border>
         <!-- Hotkey panel -->
