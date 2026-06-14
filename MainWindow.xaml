@@ -266,7 +266,7 @@
                     <TextBlock x:Name="TbVolume" Text="80%" Foreground="#cdd6f4" FontFamily="Consolas"
                                FontSize="12" VerticalAlignment="Center" Margin="6,0,0,0" Width="36"/>
                     <!-- Mono/Stereo toggle -->
-                    <Border x:Name="MonoToggleBorder" Width="64" Height="24" CornerRadius="12"
+                    <Border x:Name="MonoToggleBorder" Width="90" Height="24" CornerRadius="12"
                             Background="#45475a" Margin="12,0,0,0" Cursor="Hand"
                             MouseLeftButtonUp="MonoToggle_Click" IsEnabled="False">
                         <Grid>
