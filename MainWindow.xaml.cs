@@ -156,6 +156,7 @@ public partial class MainWindow : Window
         MonoToggleBorder.IsEnabled = on;
         BtnSendFile.IsEnabled      = on && !_uploading;
         BtnSendToPico.IsEnabled    = on;
+        BtnPullFromPico.IsEnabled  = on;
         if (!on) { TbNowPlaying.Text = "— Not connected —"; TbElapsed.Text = "--:--"; TbTrackInfo.Text = ""; }
     }
 
@@ -776,6 +777,142 @@ public partial class MainWindow : Window
         string msg = $"Sent {sent} entr{(sent == 1 ? "y" : "ies")} to Pico ✓";
         TbSchedStatus.Text = msg;
         Log($"[SCHED→PICO] {msg}");
+    }
+
+    /* ── Pull schedule from Pico ─────────────────────────────────────────── */
+    private async void BtnPullFromPico_Click(object sender, RoutedEventArgs e)
+    {
+        if (!_connected) return;
+        BtnPullFromPico.IsEnabled = false;
+        BtnSendToPico.IsEnabled   = false;
+        TbSchedStatus.Text        = "Pulling from Pico…";
+
+        var entries = await PullScheduleFromPico();
+        if (entries != null)
+        {
+            _schedules.Clear();
+            _schedules.AddRange(entries);
+            SaveSchedules();
+            RebuildSchedulePanel();
+            string msg = $"Pulled {entries.Count} entr{(entries.Count == 1 ? "y" : "ies")} from Pico ✓";
+            TbSchedStatus.Text = msg;
+            Log($"[PICO→SCHED] {msg}");
+        }
+        else
+        {
+            TbSchedStatus.Text = "ERR: no response from Pico";
+        }
+
+        BtnPullFromPico.IsEnabled = true;
+        BtnSendToPico.IsEnabled   = true;
+    }
+
+    private async System.Threading.Tasks.Task<List<ScheduleEntry>?> PullScheduleFromPico()
+    {
+        /* sched list sends:
+         *   SCHED count=N
+         *   SCHED_ENTRY #i enabled=E time=HH:MM stop=SS:MM loops=L days=DDDDDDD file=F
+         *   (×N, then silence)
+         * Collect until we have count lines or 3 s timeout. */
+        int expectedCount = -1;
+        var collected     = new List<ScheduleEntry>();
+        var tcs = new System.Threading.Tasks.TaskCompletionSource<List<ScheduleEntry>?>(
+            System.Threading.Tasks.TaskCreationOptions.RunContinuationsAsynchronously);
+
+        Action<string> h = null!;
+        h = line =>
+        {
+            if (line.StartsWith("SCHED count="))
+            {
+                if (int.TryParse(line["SCHED count=".Length..], out int n))
+                {
+                    expectedCount = n;
+                    if (n == 0) { _serial.LineReceived -= h; tcs.TrySetResult(collected); }
+                }
+            }
+            else if (line.StartsWith("SCHED_ENTRY "))
+            {
+                var entry = ParseSchedEntry(line);
+                if (entry != null) collected.Add(entry);
+                if (expectedCount >= 0 && collected.Count >= expectedCount)
+                { _serial.LineReceived -= h; tcs.TrySetResult(collected); }
+            }
+        };
+
+        _serial.LineReceived += h;
+        _serial.Send("sched list");
+
+        using var cts = new System.Threading.CancellationTokenSource(3000);
+        cts.Token.Register(() => { _serial.LineReceived -= h; tcs.TrySetResult(expectedCount < 0 ? null : collected); });
+
+        return await tcs.Task;
+    }
+
+    private static ScheduleEntry? ParseSchedEntry(string line)
+    {
+        /* SCHED_ENTRY #i enabled=E time=HH:MM stop=SS:MM loops=L days=DDDDDDD file=F */
+        var e = new ScheduleEntry();
+        foreach (var token in line.Split(' '))
+        {
+            var kv = token.Split('=', 2);
+            if (kv.Length != 2) continue;
+            switch (kv[0])
+            {
+                case "enabled": e.Enabled  = kv[1] == "1"; break;
+                case "time":    e.Time     = kv[1]; break;
+                case "stop":    e.StopTime = kv[1] == "--:--" ? "" : kv[1]; break;
+                case "loops":   e.Loops    = int.TryParse(kv[1], out int l) ? l : 1; break;
+                case "days":
+                    for (int d = 0; d < 7 && d < kv[1].Length; d++)
+                        e.Days[d] = kv[1][d] == '1';
+                    break;
+                case "file":    e.File     = kv[1]; break;
+            }
+        }
+        return string.IsNullOrEmpty(e.File) ? null : e;
+    }
+
+    /* ── Save / Load schedule file ───────────────────────────────────────── */
+    private void BtnSaveSchedFile_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new Microsoft.Win32.SaveFileDialog
+        {
+            Title      = "Save Schedule",
+            Filter     = "JSON Schedule (*.json)|*.json|All files (*.*)|*.*",
+            FileName   = "schedule.json",
+            DefaultExt = ".json"
+        };
+        if (dlg.ShowDialog() != true) return;
+        try
+        {
+            var json = System.Text.Json.JsonSerializer.Serialize(
+                _schedules, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(dlg.FileName, json);
+            TbSchedStatus.Text = $"Saved → {System.IO.Path.GetFileName(dlg.FileName)} ✓";
+        }
+        catch (Exception ex) { TbSchedStatus.Text = $"ERR: {ex.Message}"; }
+    }
+
+    private void BtnLoadSchedFile_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new Microsoft.Win32.OpenFileDialog
+        {
+            Title  = "Load Schedule",
+            Filter = "JSON Schedule (*.json)|*.json|All files (*.*)|*.*"
+        };
+        if (dlg.ShowDialog() != true) return;
+        try
+        {
+            var list = System.Text.Json.JsonSerializer.Deserialize<List<ScheduleEntry>>(
+                File.ReadAllText(dlg.FileName));
+            if (list == null) return;
+            _schedules.Clear();
+            _schedules.AddRange(list);
+            SaveSchedules();
+            RebuildSchedulePanel();
+            TbSchedStatus.Text = $"Loaded {list.Count} entries from {System.IO.Path.GetFileName(dlg.FileName)} ✓";
+        }
+        catch (Exception ex) { TbSchedStatus.Text = $"ERR: {ex.Message}"; }
     }
 
     private void LoadSchedules()

@@ -674,7 +674,7 @@
                     </Grid>
 
                     <!-- Toolbar -->
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="4,0,4,10">
+                    <WrapPanel Grid.Row="1" Orientation="Horizontal" Margin="4,0,4,10">
                         <Button x:Name="BtnAddSchedule"   Content="＋  Add Entry" Style="{StaticResource DarkBtn}"
                                 FontSize="12" Padding="14,6" Click="BtnAddSchedule_Click"/>
                         <Button x:Name="BtnClearSchedule" Content="Clear All"     Style="{StaticResource DarkBtn}"
@@ -684,12 +684,24 @@
                                 FontSize="12" Padding="14,6" IsEnabled="False" Click="BtnSendToPico_Click">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="↓ " FontSize="14" VerticalAlignment="Center"/>
-                                <TextBlock Text="Send Config to Pico" VerticalAlignment="Center"/>
+                                <TextBlock Text="Send → Pico" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
+                        <Button x:Name="BtnPullFromPico" Style="{StaticResource DarkBtn}"
+                                FontSize="12" Padding="14,6" Margin="8,0,0,0" IsEnabled="False" Click="BtnPullFromPico_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="↑ " FontSize="14" VerticalAlignment="Center"/>
+                                <TextBlock Text="Pull ← Pico" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Rectangle Width="1" Fill="#383858" Margin="14,4"/>
+                        <Button x:Name="BtnSaveSchedFile" Content="💾  Save File" Style="{StaticResource DarkBtn}"
+                                FontSize="12" Padding="14,6" Click="BtnSaveSchedFile_Click"/>
+                        <Button x:Name="BtnLoadSchedFile" Content="📂  Load File" Style="{StaticResource DarkBtn}"
+                                FontSize="12" Padding="8,6" Margin="8,0,0,0"  Click="BtnLoadSchedFile_Click"/>
                         <TextBlock x:Name="TbSchedStatus" Text="" Foreground="#5acc5a"
                                    FontSize="12" FontFamily="Consolas" VerticalAlignment="Center" Margin="20,0,0,0"/>
-                    </StackPanel>
+                    </WrapPanel>
 
                     <!-- Schedule rows -->
                     <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
