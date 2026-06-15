@@ -56,10 +56,23 @@ public partial class MainWindow : Window
         public bool[] Days     { get; set; } = new bool[7] { true,true,true,true,true,true,true };
     }
     private readonly List<ScheduleEntry> _schedules          = new();
+
+    /* ── Schedule mode ─────────────────────────────────────────────────────── */
+    private enum SchedMode { PicoScheduler, GuiScheduler }
+    private SchedMode _schedMode = SchedMode.PicoScheduler;
+
+    /* GUI-scheduler runtime state */
+    private string[]  _guiPlaylist     = Array.Empty<string>();
+    private int       _guiPlPos        = 0;
+    private int       _guiLoopsRemain  = 0;   /* -1=infinite, 0=idle, >0=countdown */
+    private string    _guiActiveTrack  = "";
+    private string    _lastSchedMinute = "";
+    private ScheduleEntry? _guiActiveEntry = null;
+
+    /* kept for Pico-loop tracking (single-track backward compat) */
     private string _schedFile           = "";
-    private int    _schedLoopsRemaining = 0;   /* -1 = infinite, 0 = idle, >0 = countdown */
+    private int    _schedLoopsRemaining = 0;
     private string _lastState           = "";
-    private string _lastSchedMinute     = "";
     private static readonly string[] DayAbbr = { "Mo","Tu","We","Th","Fr","Sa","Su" };
     private static readonly string ScheduleFile =
         IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "schedules.json");
@@ -155,9 +168,12 @@ public partial class MainWindow : Window
         foreach (var s in _eqSliders) if (s != null) s.IsEnabled = on;
         MonoToggleBorder.IsEnabled = on;
         BtnSendFile.IsEnabled      = on && !_uploading;
-        BtnSendToPico.IsEnabled    = on;
-        BtnPullFromPico.IsEnabled  = on;
-        if (!on) { TbNowPlaying.Text = "— Not connected —"; TbElapsed.Text = "--:--"; TbTrackInfo.Text = ""; }
+        UpdateSchedModeUI();
+        if (!on)
+        {
+            TbNowPlaying.Text = "— Not connected —"; TbElapsed.Text = "--:--"; TbTrackInfo.Text = "";
+            _guiLoopsRemain = 0; _guiActiveTrack = ""; _guiActiveEntry = null;
+        }
     }
 
     // ── Transport ─────────────────────────────────────────────────────────────
@@ -498,18 +514,73 @@ public partial class MainWindow : Window
             }
         }
 
-        /* schedule loop tracking  (-1=infinite, 0=idle, >0=countdown) */
-        if (_schedLoopsRemaining != 0 && !string.IsNullOrEmpty(_schedFile))
+        /* ── GUI-Scheduler playlist advance ───────────────────────────────── */
+        if (_schedMode == SchedMode.GuiScheduler &&
+            _guiLoopsRemain != 0 && _guiPlaylist.Length > 0)
+        {
+            if (_lastState == "playing" && state == "stopped")
+            {
+                /* advance to next track in playlist */
+                _guiPlPos++;
+                if (_guiPlPos >= _guiPlaylist.Length)
+                {
+                    _guiPlPos = 0;
+                    if (_guiLoopsRemain > 0) _guiLoopsRemain--;
+                }
+                if (_guiLoopsRemain != 0)
+                {
+                    _guiActiveTrack = _guiPlaylist[_guiPlPos];
+                    /* check stop time before starting next track */
+                    bool pastStop = false;
+                    if (_guiActiveEntry is { } ae && !string.IsNullOrEmpty(ae.StopTime))
+                    {
+                        string nowHM = DateTime.Now.ToString("HH:mm");
+                        pastStop = string.Compare(nowHM, ae.StopTime, StringComparison.Ordinal) >= 0;
+                    }
+                    if (!pastStop)
+                    {
+                        _serial.Send($"goto {_guiActiveTrack}");
+                        Log($"[SCHED-GUI] → {_guiActiveTrack}  (pos={_guiPlPos} loops={_guiLoopsRemain})");
+                        UpdateGuiSchedStatus();
+                    }
+                    else
+                    {
+                        GuiSchedStop("stop time reached");
+                    }
+                }
+                else
+                {
+                    GuiSchedStop("playlist done");
+                }
+            }
+
+            /* check stop time every tick */
+            if (_guiActiveEntry is { } activeEntry && !string.IsNullOrEmpty(activeEntry.StopTime))
+            {
+                string nowHM = DateTime.Now.ToString("HH:mm");
+                if (string.Compare(nowHM, activeEntry.StopTime, StringComparison.Ordinal) >= 0 &&
+                    state == "playing")
+                {
+                    _serial.Send("stop");
+                    GuiSchedStop("stop time reached");
+                }
+            }
+        }
+
+        /* ── Pico-Scheduler single-track loop (backward compat) ─────────── */
+        if (_schedMode == SchedMode.PicoScheduler &&
+            _schedLoopsRemaining != 0 && !string.IsNullOrEmpty(_schedFile))
         {
             if (_lastState == "playing" && state == "stopped")
             {
                 if (_schedLoopsRemaining > 0) _schedLoopsRemaining--;
-                if (_schedLoopsRemaining != 0)  /* still looping (or infinite) */
+                if (_schedLoopsRemaining != 0)
                     _serial.Send($"goto {_schedFile}");
                 else
                     _schedFile = "";
             }
         }
+
         _lastState = state;
 
         bool boardPaused = state == "paused";
@@ -565,6 +636,42 @@ public partial class MainWindow : Window
     }
 
     // ── Schedule ──────────────────────────────────────────────────────────────
+
+    private async void SchedModeChanged(object sender, RoutedEventArgs e)
+    {
+        if (sender is not RadioButton rb) return;
+        bool isPico = rb.Tag?.ToString() == "pico";
+        _schedMode = isPico ? SchedMode.PicoScheduler : SchedMode.GuiScheduler;
+
+        UpdateSchedModeUI();
+
+        if (_schedMode == SchedMode.GuiScheduler && _connected)
+        {
+            /* clear Pico schedule so it doesn't conflict */
+            Log("[SCHED] Switching to GUI Scheduler — clearing Pico schedule…");
+            bool ok = await SendAndWaitOk("sched clear", 3000);
+            if (ok) await SendAndWaitOk("sched save", 3000);
+            Log(ok ? "[SCHED] Pico schedule cleared ✓" : "[SCHED] WARN: could not clear Pico schedule");
+            TbSchedStatus.Text = "GUI Scheduler — idle";
+            /* reset GUI state */
+            _guiLoopsRemain = 0; _guiActiveTrack = ""; _guiActiveEntry = null;
+            _lastSchedMinute = "";
+        }
+        else if (_schedMode == SchedMode.PicoScheduler)
+        {
+            TbSchedStatus.Text = "";
+            _guiLoopsRemain = 0;
+        }
+    }
+
+    private void UpdateSchedModeUI()
+    {
+        bool isPico = _schedMode == SchedMode.PicoScheduler;
+        BtnSendToPico.Visibility  = isPico ? Visibility.Visible : Visibility.Collapsed;
+        BtnPullFromPico.Visibility = isPico ? Visibility.Visible : Visibility.Collapsed;
+        BtnSendToPico.IsEnabled   = isPico && _connected;
+        BtnPullFromPico.IsEnabled = isPico && _connected;
+    }
 
     private void BtnAddSchedule_Click(object sender, RoutedEventArgs e)
     {
@@ -844,6 +951,23 @@ public partial class MainWindow : Window
         Log($"[SCHED→PICO] {msg}");
     }
 
+    private System.Threading.Tasks.Task<bool> SendAndWaitOk(string cmd, int timeoutMs = 4000)
+    {
+        var tcs = new System.Threading.Tasks.TaskCompletionSource<bool>(
+            System.Threading.Tasks.TaskCreationOptions.RunContinuationsAsynchronously);
+        Action<string> h = null!;
+        h = line =>
+        {
+            if (line.StartsWith("OK:") || line.StartsWith("ERR:"))
+            { _serial.LineReceived -= h; tcs.TrySetResult(line.StartsWith("OK:")); }
+        };
+        _serial.LineReceived += h;
+        _serial.Send(cmd);
+        var cts = new System.Threading.CancellationTokenSource(timeoutMs);
+        cts.Token.Register(() => { _serial.LineReceived -= h; tcs.TrySetResult(false); });
+        return tcs.Task;
+    }
+
     /* ── Pull schedule from Pico ─────────────────────────────────────────── */
     private async void BtnPullFromPico_Click(object sender, RoutedEventArgs e)
     {
@@ -996,9 +1120,10 @@ public partial class MainWindow : Window
 
     private void CheckSchedule()
     {
-        if (!_connected) return;
+        if (!_connected || _schedMode != SchedMode.GuiScheduler) return;
+
         string nowHHMM = DateTime.Now.ToString("HH:mm");
-        int    dayIdx  = ((int)DateTime.Now.DayOfWeek + 6) % 7; // 0=Mon..6=Sun
+        int    dayIdx  = ((int)DateTime.Now.DayOfWeek + 6) % 7;
         string key     = nowHHMM + "/" + dayIdx;
 
         if (_lastSchedMinute != "" && !_lastSchedMinute.StartsWith(nowHHMM + "/"))
@@ -1009,15 +1134,38 @@ public partial class MainWindow : Window
         {
             if (!entry.Enabled || string.IsNullOrEmpty(entry.Tracks)) continue;
             if (entry.Time != nowHHMM || !entry.Days[dayIdx]) continue;
-            _lastSchedMinute     = key;
-            _schedFile           = entry.Tracks;
-            _schedLoopsRemaining = entry.Loops == 0 ? -1 : entry.Loops - 1;
-            _serial.Send($"goto {entry.Tracks}");
+
+            /* build playlist */
+            _guiPlaylist    = entry.Tracks.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            _guiPlPos       = 0;
+            _guiLoopsRemain = entry.Loops == 0 ? -1 : entry.Loops;
+            _guiActiveTrack = _guiPlaylist[0];
+            _guiActiveEntry = entry;
+            _lastSchedMinute = key;
+
+            _serial.Send($"goto {_guiActiveTrack}");
             string loopStr = entry.Loops == 0 ? "∞" : $"{entry.Loops}×";
-            Log($"[SCHED] {nowHHMM} → {entry.Tracks}  ({loopStr})");
-            TbSchedStatus.Text = $"Last: {nowHHMM}  {entry.Tracks}  {loopStr}";
+            Log($"[SCHED-GUI] {nowHHMM} → {_guiPlaylist.Length} tracks  ({loopStr})");
+            UpdateGuiSchedStatus();
             break;
         }
+    }
+
+    private void GuiSchedStop(string reason)
+    {
+        Log($"[SCHED-GUI] stopped: {reason}");
+        _guiLoopsRemain = 0;
+        _guiActiveTrack = "";
+        _guiActiveEntry = null;
+        UpdateGuiSchedStatus();
+    }
+
+    private void UpdateGuiSchedStatus()
+    {
+        if (_guiLoopsRemain == 0 || _guiPlaylist.Length == 0)
+        { TbSchedStatus.Text = "GUI Scheduler — idle"; return; }
+        string loops = _guiLoopsRemain < 0 ? "∞" : $"{_guiLoopsRemain} loops left";
+        TbSchedStatus.Text = $"▶ {_guiActiveTrack}  [{_guiPlPos + 1}/{_guiPlaylist.Length}]  {loops}";
     }
 
     // ── File upload ───────────────────────────────────────────────────────────

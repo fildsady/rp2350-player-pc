@@ -674,34 +674,68 @@
                     </Grid>
 
                     <!-- Toolbar -->
-                    <WrapPanel Grid.Row="1" Orientation="Horizontal" Margin="4,0,4,10">
-                        <Button x:Name="BtnAddSchedule"   Content="＋  Add Entry" Style="{StaticResource DarkBtn}"
-                                FontSize="12" Padding="14,6" Click="BtnAddSchedule_Click"/>
-                        <Button x:Name="BtnClearSchedule" Content="Clear All"     Style="{StaticResource DarkBtn}"
-                                FontSize="12" Padding="14,6" Margin="8,0,0,0"     Click="BtnClearSchedule_Click"/>
-                        <Rectangle Width="1" Fill="#383858" Margin="14,4"/>
-                        <Button x:Name="BtnSendToPico" Style="{StaticResource AccentBtn}"
-                                FontSize="12" Padding="14,6" IsEnabled="False" Click="BtnSendToPico_Click">
+                    <StackPanel Grid.Row="1" Margin="4,0,4,10">
+
+                        <!-- Mode selector -->
+                        <Border Background="#181825" CornerRadius="6" Padding="10,6" Margin="0,0,0,8">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="↓ " FontSize="14" VerticalAlignment="Center"/>
-                                <TextBlock Text="Send → Pico" VerticalAlignment="Center"/>
+                                <TextBlock Text="โหมด:" Foreground="#6c7086" FontSize="12"
+                                           VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                <RadioButton x:Name="RbPicoScheduler" Tag="pico" IsChecked="True"
+                                             Foreground="#cdd6f4" FontSize="12" VerticalAlignment="Center"
+                                             Margin="0,0,20,0" Checked="SchedModeChanged">
+                                    <RadioButton.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="🤖 " FontSize="13"/>
+                                            <TextBlock Text="Pico Scheduler" FontSize="12" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </RadioButton.Content>
+                                </RadioButton>
+                                <RadioButton x:Name="RbGuiScheduler" Tag="gui"
+                                             Foreground="#cdd6f4" FontSize="12" VerticalAlignment="Center"
+                                             Checked="SchedModeChanged">
+                                    <RadioButton.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="🖥️ " FontSize="13"/>
+                                            <TextBlock Text="GUI Scheduler (PC controls)" FontSize="12" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </RadioButton.Content>
+                                </RadioButton>
+                                <TextBlock Foreground="#585b70" FontSize="11" VerticalAlignment="Center" Margin="20,0,0,0"
+                                           Text="Pico = เก็บ schedule ใน SD card  |  GUI = PC สั่งเล่นตามเวลา (Pico schedule จะถูกล้าง)"/>
                             </StackPanel>
-                        </Button>
-                        <Button x:Name="BtnPullFromPico" Style="{StaticResource DarkBtn}"
-                                FontSize="12" Padding="14,6" Margin="8,0,0,0" IsEnabled="False" Click="BtnPullFromPico_Click">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="↑ " FontSize="14" VerticalAlignment="Center"/>
-                                <TextBlock Text="Pull ← Pico" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Rectangle Width="1" Fill="#383858" Margin="14,4"/>
-                        <Button x:Name="BtnSaveSchedFile" Content="💾  Save File" Style="{StaticResource DarkBtn}"
-                                FontSize="12" Padding="14,6" Click="BtnSaveSchedFile_Click"/>
-                        <Button x:Name="BtnLoadSchedFile" Content="📂  Load File" Style="{StaticResource DarkBtn}"
-                                FontSize="12" Padding="8,6" Margin="8,0,0,0"  Click="BtnLoadSchedFile_Click"/>
-                        <TextBlock x:Name="TbSchedStatus" Text="" Foreground="#5acc5a"
-                                   FontSize="12" FontFamily="Consolas" VerticalAlignment="Center" Margin="20,0,0,0"/>
-                    </WrapPanel>
+                        </Border>
+
+                        <!-- Buttons row -->
+                        <WrapPanel Orientation="Horizontal">
+                            <Button x:Name="BtnAddSchedule"   Content="＋  Add Entry" Style="{StaticResource DarkBtn}"
+                                    FontSize="12" Padding="14,6" Click="BtnAddSchedule_Click"/>
+                            <Button x:Name="BtnClearSchedule" Content="Clear All"     Style="{StaticResource DarkBtn}"
+                                    FontSize="12" Padding="14,6" Margin="8,0,0,0"     Click="BtnClearSchedule_Click"/>
+                            <Rectangle Width="1" Fill="#383858" Margin="14,4"/>
+                            <Button x:Name="BtnSendToPico" Style="{StaticResource AccentBtn}"
+                                    FontSize="12" Padding="14,6" IsEnabled="False" Click="BtnSendToPico_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="↓ " FontSize="14" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Send → Pico" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="BtnPullFromPico" Style="{StaticResource DarkBtn}"
+                                    FontSize="12" Padding="14,6" Margin="8,0,0,0" IsEnabled="False" Click="BtnPullFromPico_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="↑ " FontSize="14" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Pull ← Pico" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Rectangle Width="1" Fill="#383858" Margin="14,4"/>
+                            <Button x:Name="BtnSaveSchedFile" Content="💾  Save File" Style="{StaticResource DarkBtn}"
+                                    FontSize="12" Padding="14,6" Click="BtnSaveSchedFile_Click"/>
+                            <Button x:Name="BtnLoadSchedFile" Content="📂  Load File" Style="{StaticResource DarkBtn}"
+                                    FontSize="12" Padding="8,6" Margin="8,0,0,0"  Click="BtnLoadSchedFile_Click"/>
+                            <TextBlock x:Name="TbSchedStatus" Text="" Foreground="#5acc5a"
+                                       FontSize="12" FontFamily="Consolas" VerticalAlignment="Center" Margin="20,0,0,0"/>
+                        </WrapPanel>
+                    </StackPanel>
 
                     <!-- Schedule rows -->
                     <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
