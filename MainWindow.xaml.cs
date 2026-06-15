@@ -119,6 +119,29 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
+    private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2)
+        {
+            WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+            return;
+        }
+        DragMove();
+    }
+
+    private void BtnMinimize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+
+    private void BtnMaximize_Click(object sender, RoutedEventArgs e)
+        => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+
+    private void BtnClose_Click(object sender, RoutedEventArgs e) => Close();
+
+    private void Window_StateChanged(object sender, EventArgs e)
+    {
+        if (TbMaxIcon == null) return;
+        TbMaxIcon.Text = WindowState == WindowState.Maximized ? "⧅" : "□";
+    }
+
     private void RefreshPorts()
     {
         var ports = SerialService.GetPortNames();
