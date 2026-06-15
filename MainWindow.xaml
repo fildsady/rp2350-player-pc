@@ -705,6 +705,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
@@ -825,8 +826,28 @@
                         </Grid>
                     </Border>
 
+                    <!-- Spectrum Analyzer -->
+                    <Border Grid.Row="4" Background="#181825" CornerRadius="6" Padding="10,8" Margin="0,0,0,10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="80"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="Spectrum" Foreground="#6c7086" FontSize="11"
+                                           VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <TextBlock x:Name="TbSpectrumStatus" Text="off"
+                                           Foreground="#45475a" FontSize="11" FontFamily="Consolas"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <Canvas Grid.Row="1" x:Name="SpectrumCanvas"
+                                    Background="Transparent" ClipToBounds="True"
+                                    SizeChanged="SpectrumCanvas_SizeChanged"/>
+                        </Grid>
+                    </Border>
+
                     <!-- Serial Log -->
-                    <Border Grid.Row="4" Background="#181825" CornerRadius="6" Padding="2">
+                    <Border Grid.Row="5" Background="#181825" CornerRadius="6" Padding="2">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
