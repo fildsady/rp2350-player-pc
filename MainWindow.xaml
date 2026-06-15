@@ -736,11 +736,21 @@
                 <Ellipse Grid.Row="0" Grid.Column="7" x:Name="StatusDot" Width="12" Height="12"
                          Fill="#f38ba8" Margin="12,0,0,0" VerticalAlignment="Center"/>
 
-                <!-- Row 1: firmware version + send file -->
+                <!-- Row 1: firmware version + quick controls + send file -->
                 <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="8"
                             Orientation="Horizontal" Margin="0,6,0,0">
                     <TextBlock x:Name="TbFirmware" Text="" Foreground="#6c7086" FontSize="12"
                                VerticalAlignment="Center"/>
+                    <!-- Quick playback buttons (always visible) -->
+                    <Button x:Name="BtnQPlay"  Content="▶" Style="{StaticResource DarkBtn}" Foreground="#5acc5a"
+                            Padding="8,3" FontSize="13" Width="34" IsEnabled="False"
+                            Click="BtnPlay_Click"  ToolTip="Play" Margin="12,0,2,0"/>
+                    <Button x:Name="BtnQPause" Content="⏸" Style="{StaticResource DarkBtn}" Foreground="#ccaa40"
+                            Padding="8,3" FontSize="13" Width="34" IsEnabled="False"
+                            Click="BtnPause_Click" ToolTip="Pause" Margin="0,0,2,0"/>
+                    <Button x:Name="BtnQStop"  Content="⏹" Style="{StaticResource DarkBtn}" Foreground="#cc5a5a"
+                            Padding="8,3" FontSize="13" Width="34" IsEnabled="False"
+                            Click="BtnStop_Click"  ToolTip="Stop" Margin="0,0,0,0"/>
                     <Button x:Name="BtnSendFile" Content="📤 Send File" Style="{StaticResource DarkBtn}"
                             Padding="8,4" FontSize="12" IsEnabled="False" Click="BtnSendFile_Click"
                             Margin="12,0,0,0"/>

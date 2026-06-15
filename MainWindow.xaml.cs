@@ -381,6 +381,9 @@ public partial class MainWindow : Window
         BtnPause.IsEnabled        = on;
         BtnStop.IsEnabled         = on;
         BtnNext.IsEnabled         = on;
+        BtnQPlay.IsEnabled        = on;
+        BtnQPause.IsEnabled       = on;
+        BtnQStop.IsEnabled        = on;
         BtnGoto.IsEnabled         = on;
         BtnSyncTime.IsEnabled     = on;
         SlVolume.IsEnabled        = on;
