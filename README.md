@@ -1,4 +1,4 @@
-# RP2350 Player — PC GUI (Windows)
+# PicoAudioCore — PC GUI (Windows)
 
 แอปพลิเคชัน **WPF (.NET 10, Windows)** สำหรับควบคุม RP2350 MP3 Player ผ่าน USB Serial  
 รองรับการตั้งค่า EQ, Schedule, Volume และเรียกดูไฟล์บน SD card
