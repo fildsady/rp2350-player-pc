@@ -44,6 +44,10 @@ public partial class MainWindow : Window
         IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "lastport.txt");
     private static readonly string WindowStateFile =
         IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "windowstate.json");
+    private static readonly string SettingsFile =
+        IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
+
+    private bool _autoConnect = false;
 
     // ── Schedule ──────────────────────────────────────────────────────────────
     private class ScheduleEntry
@@ -81,11 +85,13 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         RestoreWindowState();
+        LoadSettings();
         BuildHotkeySlots();
         LoadHotkeys();
         BuildEqSliders();
         LoadSchedules();
         RefreshPorts();
+        Loaded += (_, _) => { if (_autoConnect) TryAutoConnect(); };
 
         _serial.LineReceived += OnLineReceived;
         _serial.Disconnected += () => Dispatcher.Invoke(() =>
@@ -142,6 +148,48 @@ public partial class MainWindow : Window
         TbMaxIcon.Text = WindowState == WindowState.Maximized ? "⧅" : "□";
     }
 
+    private void LoadSettings()
+    {
+        if (!File.Exists(SettingsFile)) return;
+        try
+        {
+            var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(SettingsFile));
+            if (doc.RootElement.TryGetProperty("autoconnect", out var v))
+                _autoConnect = v.GetBoolean();
+        }
+        catch { }
+        if (TgAutoConnect != null)
+            TgAutoConnect.IsChecked = _autoConnect;
+    }
+
+    private void SaveSettings()
+    {
+        var json = System.Text.Json.JsonSerializer.Serialize(new { autoconnect = _autoConnect });
+        File.WriteAllText(SettingsFile, json);
+    }
+
+    private void TryAutoConnect()
+    {
+        if (CbPort.Items.Count == 0) return;
+        if (CbPort.SelectedItem is not string port) return;
+        if (_serial.Open(port))
+        {
+            File.WriteAllText(LastPortFile, port);
+            SetConnected(true);
+            _beatTimer.Start();
+            _serial.Send("version");
+            Log($"[AUTO] Connected to {port}");
+        }
+        else
+            Log($"[AUTO] Cannot open {port}");
+    }
+
+    private void TgAutoConnect_Click(object sender, RoutedEventArgs e)
+    {
+        _autoConnect = TgAutoConnect.IsChecked == true;
+        SaveSettings();
+    }
+
     private void RefreshPorts()
     {
         var ports = SerialService.GetPortNames();
@@ -150,7 +198,7 @@ public partial class MainWindow : Window
         if (CbPort.Items.Count == 0) return;
         string last = File.Exists(LastPortFile) ? File.ReadAllText(LastPortFile).Trim() : "";
         int idx = CbPort.Items.IndexOf(last);
-        CbPort.SelectedIndex = idx >= 0 ? idx : 0;
+        CbPort.SelectedIndex = idx >= 0 ? idx : CbPort.Items.Count - 1;
     }
 
     private void BtnConnect_Click(object sender, RoutedEventArgs e)

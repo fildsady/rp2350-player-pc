@@ -479,6 +479,7 @@
                     <ColumnDefinition Width="140"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
@@ -566,12 +567,54 @@
                 </ComboBox>
                 <Button    Grid.Column="2" x:Name="BtnRefresh" Content="⟳" Style="{StaticResource DarkBtn}" Margin="6,0" Width="32" Click="BtnRefresh_Click"/>
                 <Button    Grid.Column="3" x:Name="BtnConnect" Content="Connect" Style="{StaticResource AccentBtn}" Width="100" Click="BtnConnect_Click"/>
-                <TextBlock Grid.Column="4" x:Name="TbFirmware" Text="" Foreground="#6c7086" FontSize="13"                           HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0"/>
-                <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+
+                <!-- Autoconnect toggle -->
+                <ToggleButton Grid.Column="4" x:Name="TgAutoConnect" Click="TgAutoConnect_Click"
+                              VerticalAlignment="Center" Margin="12,0,0,0" Padding="10,5"
+                              ToolTip="Autoconnect — เชื่อมต่อ COM port ล่าสุดอัตโนมัติเมื่อเปิดแอป">
+                    <ToggleButton.Style>
+                        <Style TargetType="ToggleButton">
+                            <Setter Property="Background" Value="#1e1e2e"/>
+                            <Setter Property="Foreground" Value="#6c7086"/>
+                            <Setter Property="BorderBrush" Value="#383858"/>
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="3" Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="#1e3a2f"/>
+                                                <Setter TargetName="Bd" Property="BorderBrush" Value="#a6e3a1"/>
+                                                <Setter Property="Foreground" Value="#a6e3a1"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="BorderBrush" Value="#585b70"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ToggleButton.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="TbAutoConnectDot" Text="⏻ " FontSize="13"/>
+                        <TextBlock Text="Autoconnect" FontSize="13"/>
+                    </StackPanel>
+                </ToggleButton>
+
+                <TextBlock Grid.Column="5" x:Name="TbFirmware" Text="" Foreground="#6c7086" FontSize="13"                           HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0"/>
+                <StackPanel Grid.Column="5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                     <Button x:Name="BtnSendFile" Content="📤 Send File" Style="{StaticResource DarkBtn}"
                             Padding="10,5" FontSize="13" IsEnabled="False" Click="BtnSendFile_Click"/>
                 </StackPanel>
-                <Ellipse Grid.Column="5" x:Name="StatusDot" Width="12" Height="12"
+                <Ellipse Grid.Column="6" x:Name="StatusDot" Width="12" Height="12"
                          Fill="#f38ba8" Margin="12,0,0,0" VerticalAlignment="Center"/>
             </Grid>
         </Border>
