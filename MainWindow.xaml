@@ -480,6 +480,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
@@ -609,12 +610,53 @@
                     </StackPanel>
                 </ToggleButton>
 
-                <TextBlock Grid.Column="5" x:Name="TbFirmware" Text="" Foreground="#6c7086" FontSize="13"                           HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0"/>
-                <StackPanel Grid.Column="5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <!-- Startup on boot toggle -->
+                <ToggleButton Grid.Column="5" x:Name="TgStartup" Click="TgStartup_Click"
+                              VerticalAlignment="Center" Margin="8,0,0,0" Padding="10,5"
+                              ToolTip="เปิดแอปพร้อม Windows อัตโนมัติ (บันทึกใน Registry HKCU Run)">
+                    <ToggleButton.Style>
+                        <Style TargetType="ToggleButton">
+                            <Setter Property="Background" Value="#1e1e2e"/>
+                            <Setter Property="Foreground" Value="#6c7086"/>
+                            <Setter Property="BorderBrush" Value="#383858"/>
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="3" Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="#2a1f3d"/>
+                                                <Setter TargetName="Bd" Property="BorderBrush" Value="#cba6f7"/>
+                                                <Setter Property="Foreground" Value="#cba6f7"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="BorderBrush" Value="#585b70"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ToggleButton.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="⊞ " FontSize="13"/>
+                        <TextBlock Text="Run on startup" FontSize="13"/>
+                    </StackPanel>
+                </ToggleButton>
+
+                <TextBlock Grid.Column="6" x:Name="TbFirmware" Text="" Foreground="#6c7086" FontSize="13" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0"/>
+                <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                     <Button x:Name="BtnSendFile" Content="📤 Send File" Style="{StaticResource DarkBtn}"
                             Padding="10,5" FontSize="13" IsEnabled="False" Click="BtnSendFile_Click"/>
                 </StackPanel>
-                <Ellipse Grid.Column="6" x:Name="StatusDot" Width="12" Height="12"
+                <Ellipse Grid.Column="7" x:Name="StatusDot" Width="12" Height="12"
                          Fill="#f38ba8" Margin="12,0,0,0" VerticalAlignment="Center"/>
             </Grid>
         </Border>

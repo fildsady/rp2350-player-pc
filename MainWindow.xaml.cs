@@ -49,6 +49,25 @@ public partial class MainWindow : Window
 
     private bool _autoConnect = false;
 
+    private const string StartupRegKey  = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
+    private const string StartupAppName = "PicoAudioCore";
+
+    private static bool IsStartupEnabled()
+    {
+        using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(StartupRegKey);
+        return key?.GetValue(StartupAppName) != null;
+    }
+
+    private static void SetStartup(bool enable)
+    {
+        using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(StartupRegKey, writable: true);
+        if (key == null) return;
+        if (enable)
+            key.SetValue(StartupAppName, $"\"{System.Diagnostics.Process.GetCurrentProcess().MainModule!.FileName}\"");
+        else
+            key.DeleteValue(StartupAppName, throwOnMissingValue: false);
+    }
+
     // ── Schedule ──────────────────────────────────────────────────────────────
     private class ScheduleEntry
     {
@@ -160,6 +179,8 @@ public partial class MainWindow : Window
         catch { }
         if (TgAutoConnect != null)
             TgAutoConnect.IsChecked = _autoConnect;
+        if (TgStartup != null)
+            TgStartup.IsChecked = IsStartupEnabled();
     }
 
     private void SaveSettings()
@@ -188,6 +209,19 @@ public partial class MainWindow : Window
     {
         _autoConnect = TgAutoConnect.IsChecked == true;
         SaveSettings();
+    }
+
+    private void TgStartup_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            SetStartup(TgStartup.IsChecked == true);
+        }
+        catch (Exception ex)
+        {
+            TgStartup.IsChecked = IsStartupEnabled();
+            Log($"[ERR] Startup registry: {ex.Message}");
+        }
     }
 
     private void RefreshPorts()
