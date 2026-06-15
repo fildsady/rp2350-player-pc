@@ -175,9 +175,58 @@ public partial class MainWindow : Window
         Log("[SIGGEN] off");
     }
 
+    private bool _sigFreqUpdating = false;
+
     private void BtnSigFreqPreset_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button btn) TbSigFreq.Text = (string)btn.Tag;
+        if (sender is Button btn)
+        {
+            _sigFreqUpdating = true;
+            TbSigFreq.Text = (string)btn.Tag;
+            if (double.TryParse((string)btn.Tag, out var f)) SlSigFreq.Value = f;
+            _sigFreqUpdating = false;
+        }
+    }
+
+    private void SlSigFreq_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (_sigFreqUpdating || TbSigFreq == null) return;
+        int hz = (int)SlSigFreq.Value;
+        _sigFreqUpdating = true;
+        TbSigFreq.Text = hz.ToString();
+        _sigFreqUpdating = false;
+        SendSigFreqLive(hz);
+    }
+
+    private void TbSigFreq_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        if (_sigFreqUpdating || SlSigFreq == null) return;
+        if (int.TryParse(TbSigFreq.Text, out var hz) && hz >= 1 && hz <= 20000)
+        {
+            _sigFreqUpdating = true;
+            SlSigFreq.Value = hz;
+            _sigFreqUpdating = false;
+            SendSigFreqLive(hz);
+        }
+    }
+
+    private void SendSigFreqLive(int hz)
+    {
+        if (!_connected || SigGenStatusBar.Visibility != Visibility.Visible) return;
+        _serial.Send($"sigfreq {hz}");
+        TbSigStatus.Text = $"Running:  {GetSelectedWaveform()}  {hz} Hz";
+    }
+
+    private void SlSigVolume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (TbSigVolPct == null) return;
+        int v = (int)SlSigVolume.Value;
+        TbSigVolPct.Text = $"{v}%";
+        string dbStr = v == 0 ? "−∞ dBFS" : $"{20.0 * Math.Log10(v / 100.0):0.0} dBFS";
+        TbSigVolDb.Text = dbStr;
+        // sync with Player tab slider and send to board
+        if (SlVolume != null) SlVolume.Value = v;
+        if (_connected && _volumeSync) _serial.Send($"volume {v}");
     }
 
     private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
@@ -504,6 +553,7 @@ public partial class MainWindow : Window
         if (TbVolume == null) return;
         int v = (int)SlVolume.Value;
         TbVolume.Text = $"{v}%";
+        if (SlSigVolume != null && (int)SlSigVolume.Value != v) SlSigVolume.Value = v;
         if (_connected && _volumeSync) _serial.Send($"volume {v}");
     }
 

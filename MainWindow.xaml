@@ -962,6 +962,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
@@ -989,47 +990,91 @@
                     <!-- Frequency + control -->
                     <Border Grid.Row="1" Background="#313244" CornerRadius="6" Padding="16,12" Margin="0,0,0,10">
                         <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="100"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Column="0" Text="Frequency (Hz)" Foreground="#6c7086" FontSize="13"
+                            <!-- Row 0: label + textbox + presets + buttons -->
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Frequency" Foreground="#6c7086" FontSize="13"
                                        VerticalAlignment="Center" Margin="0,0,12,0"/>
-                            <TextBox Grid.Column="1" x:Name="TbSigFreq" Text="1000"
+                            <TextBox Grid.Row="0" Grid.Column="1" x:Name="TbSigFreq" Text="1000"
                                      Height="30" Background="#1e1e2e" Foreground="#cdd6f4"
                                      BorderBrush="#45475a" BorderThickness="1"
-                                     Padding="8,4" FontSize="13" VerticalContentAlignment="Center"/>
-                            <TextBlock Grid.Column="2" Text="Hz" Foreground="#6c7086" FontSize="13"
+                                     Padding="8,4" FontSize="13" VerticalContentAlignment="Center"
+                                     TextChanged="TbSigFreq_TextChanged"/>
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Hz" Foreground="#6c7086" FontSize="13"
                                        VerticalAlignment="Center" Margin="8,0,0,0"/>
 
                             <!-- Freq presets -->
-                            <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="16,0,0,0" VerticalAlignment="Center">
-                                <Button Content="50" Tag="50"   Style="{StaticResource DarkBtn}" Padding="8,4" Margin="0,0,4,0" Click="BtnSigFreqPreset_Click" FontSize="12"/>
-                                <Button Content="100" Tag="100" Style="{StaticResource DarkBtn}" Padding="8,4" Margin="0,0,4,0" Click="BtnSigFreqPreset_Click" FontSize="12"/>
-                                <Button Content="440" Tag="440" Style="{StaticResource DarkBtn}" Padding="8,4" Margin="0,0,4,0" Click="BtnSigFreqPreset_Click" FontSize="12"/>
-                                <Button Content="1k"  Tag="1000" Style="{StaticResource DarkBtn}" Padding="8,4" Margin="0,0,4,0" Click="BtnSigFreqPreset_Click" FontSize="12"/>
-                                <Button Content="5k"  Tag="5000" Style="{StaticResource DarkBtn}" Padding="8,4" Margin="0,0,4,0" Click="BtnSigFreqPreset_Click" FontSize="12"/>
+                            <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Horizontal" Margin="16,0,0,0" VerticalAlignment="Center">
+                                <Button Content="50"  Tag="50"    Style="{StaticResource DarkBtn}" Padding="8,4" Margin="0,0,4,0" Click="BtnSigFreqPreset_Click" FontSize="12"/>
+                                <Button Content="100" Tag="100"   Style="{StaticResource DarkBtn}" Padding="8,4" Margin="0,0,4,0" Click="BtnSigFreqPreset_Click" FontSize="12"/>
+                                <Button Content="440" Tag="440"   Style="{StaticResource DarkBtn}" Padding="8,4" Margin="0,0,4,0" Click="BtnSigFreqPreset_Click" FontSize="12"/>
+                                <Button Content="1k"  Tag="1000"  Style="{StaticResource DarkBtn}" Padding="8,4" Margin="0,0,4,0" Click="BtnSigFreqPreset_Click" FontSize="12"/>
+                                <Button Content="5k"  Tag="5000"  Style="{StaticResource DarkBtn}" Padding="8,4" Margin="0,0,4,0" Click="BtnSigFreqPreset_Click" FontSize="12"/>
                                 <Button Content="10k" Tag="10000" Style="{StaticResource DarkBtn}" Padding="8,4" Margin="0,0,4,0" Click="BtnSigFreqPreset_Click" FontSize="12"/>
                                 <Button Content="20k" Tag="20000" Style="{StaticResource DarkBtn}" Padding="8,4" Margin="0,0,0,0"  Click="BtnSigFreqPreset_Click" FontSize="12"/>
                             </StackPanel>
 
                             <!-- Start / Stop -->
-                            <Button Grid.Column="4" x:Name="BtnSigStart" Content="▶  Start"
+                            <Button Grid.Row="0" Grid.Column="4" x:Name="BtnSigStart" Content="▶  Start"
                                     Style="{StaticResource AccentBtn}" Width="110" Margin="16,0,8,0"
                                     IsEnabled="False" Click="BtnSigStart_Click"/>
-                            <Button Grid.Column="5" x:Name="BtnSigStop" Content="■  Stop"
+                            <Button Grid.Row="0" Grid.Column="5" x:Name="BtnSigStop" Content="■  Stop"
                                     Style="{StaticResource DarkBtn}" Width="90"
                                     IsEnabled="False" Click="BtnSigStop_Click"/>
+
+                            <!-- Row 1: frequency slider (log scale via value converter trick — linear 1..20000) -->
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="1 Hz" Foreground="#585b70" FontSize="11"
+                                       VerticalAlignment="Center" Margin="0,6,8,0"/>
+                            <Slider Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4"
+                                    x:Name="SlSigFreq"
+                                    Minimum="1" Maximum="20000" Value="1000"
+                                    SmallChange="1" LargeChange="500"
+                                    Style="{StaticResource AVFaderH}"
+                                    Margin="0,6,0,0"
+                                    ValueChanged="SlSigFreq_ValueChanged"/>
+                            <TextBlock Grid.Row="1" Grid.Column="5" Text="20k Hz" Foreground="#585b70" FontSize="11"
+                                       VerticalAlignment="Center" Margin="8,6,0,0"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Volume (dBFS) -->
+                    <Border Grid.Row="2" Background="#313244" CornerRadius="6" Padding="16,12" Margin="0,0,0,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="80"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Volume" Foreground="#6c7086" FontSize="13"
+                                       VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            <Slider Grid.Column="1" x:Name="SlSigVolume"
+                                    Minimum="0" Maximum="100" Value="80" SmallChange="1" LargeChange="5"
+                                    Style="{StaticResource AVFaderH}"
+                                    VerticalAlignment="Center"
+                                    ValueChanged="SlSigVolume_ValueChanged"/>
+                            <TextBlock Grid.Column="2" x:Name="TbSigVolPct" Text="80%"
+                                       Foreground="#cdd6f4" FontSize="13"
+                                       VerticalAlignment="Center" HorizontalAlignment="Right" Margin="8,0"/>
+                            <TextBlock Grid.Column="3" x:Name="TbSigVolDb" Text="−1.9 dBFS"
+                                       Foreground="#a6adc8" FontSize="12"
+                                       VerticalAlignment="Center" HorizontalAlignment="Right"/>
                         </Grid>
                     </Border>
 
                     <!-- Status -->
-                    <Border Grid.Row="2" x:Name="SigGenStatusBar" Background="#1e3a2f" CornerRadius="6"
+                    <Border Grid.Row="4" x:Name="SigGenStatusBar" Background="#1e3a2f" CornerRadius="6"
                             Padding="16,10" Margin="0,0,0,10" Visibility="Collapsed">
                         <StackPanel Orientation="Horizontal">
                             <Ellipse Width="8" Height="8" Fill="#a6e3a1" VerticalAlignment="Center" Margin="0,0,8,0">
@@ -1055,10 +1100,10 @@
                     </Border>
 
                     <!-- Info -->
-                    <Border Grid.Row="3" Background="#181825" CornerRadius="6" Padding="16,14">
+                    <Border Grid.Row="4" Background="#181825" CornerRadius="6" Padding="16,14">
                         <StackPanel>
                             <TextBlock Text="หมายเหตุ" Foreground="#6c7086" FontSize="12" Margin="0,0,0,8"/>
-                            <TextBlock TextWrapping="Wrap" Foreground="#45475a" FontSize="12" LineHeight="22">
+                            <TextBlock TextWrapping="Wrap" Foreground="#a6adc8" FontSize="12" LineHeight="22">
                                 • <Run Foreground="#89b4fa">Sine / Square / Triangle / Sawtooth</Run> — ใส่ความถี่ 1–20000 Hz&#x0a;
                                 • <Run Foreground="#89b4fa">White Noise</Run> — broadband, ความถี่ไม่มีผล&#x0a;
                                 • <Run Foreground="#89b4fa">Pink Noise</Run> — 1/f spectrum (เหมือนเสียงธรรมชาติ), ความถี่ไม่มีผล&#x0a;
@@ -1225,6 +1270,44 @@
 
                         <Rectangle Height="1" Fill="#313244" Margin="0,12,0,12"/>
 
+                        <!-- ── SigGen ── -->
+                        <TextBlock Text="แท็บ SigGen — Audio Signal Generator" Foreground="#89b4fa" FontSize="13" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <TextBlock TextWrapping="Wrap" Foreground="#cdd6f4" FontSize="13" Margin="0,0,0,8">
+                            สร้างสัญญาณเสียงทดสอบออกทาง DAC โดยตรง — ใช้ทดสอบลำโพง, วัด frequency response หรือ burn-in ระบบเสียง
+                        </TextBlock>
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/><RowDefinition/><RowDefinition/>
+                                <RowDefinition/><RowDefinition/><RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Sine"         Foreground="#a6e3a1" FontFamily="Consolas" FontSize="13"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="คลื่นไซน์บริสุทธิ์ — ทดสอบความถี่เดี่ยว" Foreground="#cdd6f4" FontSize="13" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Square"       Foreground="#a6e3a1" FontFamily="Consolas" FontSize="13"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="คลื่นสี่เหลี่ยม — harmonics คี่สูง" Foreground="#cdd6f4" FontSize="13" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Triangle"     Foreground="#a6e3a1" FontFamily="Consolas" FontSize="13"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="คลื่นสามเหลี่ยม — harmonics คี่ลดลงเร็ว" Foreground="#cdd6f4" FontSize="13" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Sawtooth"     Foreground="#a6e3a1" FontFamily="Consolas" FontSize="13"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="คลื่นฟันเลื่อย — harmonics ทั้งคี่และคู่" Foreground="#cdd6f4" FontSize="13" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="White Noise"  Foreground="#a6e3a1" FontFamily="Consolas" FontSize="13"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="สัญญาณสุ่ม broadband — ทดสอบ full range" Foreground="#cdd6f4" FontSize="13" Margin="8,0,0,0"/>
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Pink Noise"   Foreground="#a6e3a1" FontFamily="Consolas" FontSize="13"/>
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="1/f spectrum — ใกล้เคียงเสียงธรรมชาติ ใช้ room acoustics" Foreground="#cdd6f4" FontSize="13" Margin="8,0,0,0"/>
+                        </Grid>
+                        <TextBlock TextWrapping="Wrap" Foreground="#a6adc8" FontSize="13" Margin="0,0,0,4">
+                            • <Run Foreground="#cdd6f4">Frequency slider</Run>  ลากหรือพิมพ์ 1–20000 Hz — ปรับได้แบบ live ขณะ running&#10;• <Run Foreground="#cdd6f4">Volume (dBFS)</Run>  ปรับระดับเสียง — sync กับ Player tab อัตโนมัติ&#10;• กด <Run Foreground="#cdd6f4">Start</Run> เพื่อเริ่ม, กด <Run Foreground="#cdd6f4">Stop</Run> เพื่อหยุดและกลับสู่โหมดเล่นเพลงปกติ
+                        </TextBlock>
+                        <Border Background="#181825" CornerRadius="6" Padding="12,10" Margin="0,6,0,4">
+                            <TextBlock FontFamily="Consolas" FontSize="13" Foreground="#cdd6f4" TextWrapping="Wrap">
+                                <Run Foreground="#a6e3a1">siggen</Run> <Run Foreground="#fab387">sine|square|triangle|saw|white|pink [freq_hz]</Run>&#10;<Run Foreground="#a6e3a1">siggen off</Run>&#10;<Run Foreground="#a6e3a1">sigfreq</Run> <Run Foreground="#fab387">&lt;1-20000&gt;</Run>    — เปลี่ยนความถี่ live โดยไม่หยุด
+                            </TextBlock>
+                        </Border>
+
+                        <Rectangle Height="1" Fill="#313244" Margin="0,12,0,12"/>
+
                         <!-- ── Tips ── -->
                         <TextBlock Text="เคล็ดลับ" Foreground="#89b4fa" FontSize="13" FontWeight="Bold" Margin="0,0,0,8"/>
                         <StackPanel>
@@ -1301,6 +1384,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="MCU" Foreground="#6c7086" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
@@ -1326,6 +1410,9 @@
 
                             <TextBlock Grid.Row="7" Grid.Column="0" Text="Scheduler" Foreground="#6c7086" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
                             <TextBlock Grid.Row="7" Grid.Column="1" Text="Powman AON Timer RTC  ·  16 entries  ·  Dual-mode" Foreground="#cdd6f4" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
+
+                            <TextBlock Grid.Row="8" Grid.Column="0" Text="Signal Gen" Foreground="#6c7086" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
+                            <TextBlock Grid.Row="8" Grid.Column="1" Text="Sine · Square · Triangle · Saw · White · Pink Noise" Foreground="#cdd6f4" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
                         </Grid>
 
                         <Separator Background="#383858" Margin="0,0,0,20"/>

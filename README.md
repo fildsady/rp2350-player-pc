@@ -1,13 +1,15 @@
 # PicoAudioCore — PC GUI v2.1 (Windows)
 
 แอปพลิเคชัน **WPF (.NET 10, Windows)** สำหรับควบคุม PicoAudioCore Firmware ผ่าน USB Serial  
-รองรับการตั้งค่า EQ, Schedule, Volume และเรียกดูไฟล์บน SD card
+รองรับการตั้งค่า EQ, Schedule, Signal Generator, Volume และเรียกดูไฟล์บน SD card
 
 ---
 
 ## คุณสมบัติ
 
 - **เชื่อมต่อ USB Serial** — เลือก COM port, Connect/Disconnect
+- **Autoconnect** — เชื่อมต่อ port ล่าสุดอัตโนมัติเมื่อเปิดแอป (toggle ได้)
+- **Run on Startup** — เพิ่มเข้า Windows startup (HKCU registry)
 - **ควบคุม Playback** — Play, Pause, Stop, Next, Prev, กระโดดไปยัง track ใดก็ได้
 - **32-band EQ** — ปรับ slider ±12 dB ต่อ band, sync กับ Pico อัตโนมัติ, Reset to flat
 - **Volume** — slider 0–100 sync กับ Pico
@@ -16,7 +18,10 @@
 - **สองโหมด Schedule** — Pico Scheduler (เก็บใน SD) หรือ GUI Scheduler (PC สั่งเล่น)
 - **Pull Schedule จาก Pico** — ดึง schedule ที่บันทึกอยู่ใน SD กลับมาแสดงใน GUI
 - **Save / Load Schedule** — บันทึกเป็น JSON ลงเครื่อง PC
+- **Audio Signal Generator** — Sine / Square / Triangle / Sawtooth / White Noise / Pink Noise  
+  ปรับความถี่ 1–20000 Hz แบบ live slider, ปรับ Volume (dBFS) ขณะ running
 - **Log console** — แสดง Serial response แบบ real-time
+- **Custom dark title bar** — ออกแบบให้เข้ากับ theme (WindowChrome, ไม่มี Windows chrome)
 
 ---
 
@@ -59,7 +64,7 @@ dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=
 
 1. เสียบ Pico 2 ผ่าน USB
 2. เลือก COM port จาก dropdown
-3. คลิก **Connect**
+3. คลิก **Connect** — หรือเปิด **Autoconnect** ให้ต่ออัตโนมัติ
 
 ### 2. แท็บ Player
 
@@ -117,6 +122,24 @@ dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=
 - **Save File** — บันทึก schedule เป็น `.json` ลงเครื่อง PC
 - **Load File** — โหลด `.json` กลับมาแสดงใน GUI (แทนที่ schedule ปัจจุบัน)
 
+### 5. แท็บ SigGen — Audio Signal Generator
+
+ใช้สร้างสัญญาณเสียงทดสอบออกทาง DAC โดยตรง เหมาะสำหรับทดสอบลำโพง, วัด frequency response หรือ burn-in ระบบเสียง
+
+| Waveform | ลักษณะ |
+|----------|--------|
+| Sine | คลื่นไซน์บริสุทธิ์ — ทดสอบความถี่เดี่ยว |
+| Square | คลื่นสี่เหลี่ยม — harmonics คี่สูง |
+| Triangle | คลื่นสามเหลี่ยม — harmonics คี่ลดลงเร็ว |
+| Sawtooth | คลื่นฟันเลื่อย — harmonics ทั้งคี่และคู่ |
+| White Noise | สัญญาณสุ่ม broadband — ทดสอบ full range |
+| Pink Noise | 1/f spectrum — ใกล้เคียงเสียงธรรมชาติ ใช้ room acoustics |
+
+- **Frequency slider** — ลากหรือพิมพ์ 1–20000 Hz  
+  เปลี่ยนความถี่แบบ **live** ขณะ running โดยไม่หยุดเสียง (ส่ง `sigfreq` command)
+- **Volume (dBFS)** — ปรับระดับเสียง sync กับ Player tab อัตโนมัติ
+- กด **Start** เพื่อเริ่ม → กด **Stop** เพื่อหยุดและกลับสู่โหมดเล่นเพลงปกติ
+
 ---
 
 ## Schedule JSON Format
@@ -156,6 +179,9 @@ sched clear / sched pause / sched resume
 sched add time=HH:MM [stop=HH:MM] tracks=name1,name2 [loops=N] [days=1111111] [enabled=1]
 sched save
 date YYYY-MM-DD HH:MM:SS
+siggen sine|square|triangle|saw|white|pink [freq_hz]
+siggen off
+sigfreq <1-20000>
 ```
 
 ---
