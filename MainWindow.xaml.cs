@@ -16,12 +16,16 @@ namespace PicoAudioCore;
 public partial class MainWindow : Window
 {
     private readonly SerialService   _serial      = new();
-    private readonly DispatcherTimer _clockTimer  = new();
-    private readonly DispatcherTimer _beatTimer   = new();
+    private readonly DispatcherTimer _clockTimer     = new();
+    private readonly DispatcherTimer _beatTimer      = new();
+    private readonly DispatcherTimer _reconnectTimer = new();
 
-    private bool   _connected   = false;
-    private bool   _paused      = false;
-    private string _repeatMode  = "";
+    private bool   _connected    = false;
+    private bool   _paused       = false;
+    private string _repeatMode   = "";
+    private int    _currentTrack = 0;   /* 1-based, from STATUS track= */
+    private int    _totalTracks  = 0;   /* from STATUS total= */
+    private static readonly Random _rng = new();
     private bool   _autoPlay    = true;
     private bool   _volumeSync  = false;
     private bool   _eqSync      = false;
@@ -29,12 +33,9 @@ public partial class MainWindow : Window
     private bool   _uploading   = false;
     private const int UploadChunk = 512;
 
-    private const int EqBands = 32;
+    private const int EqBands = 10;
     private static readonly float[] EqFreqs = {
-        16, 20, 25, 31.5f, 40, 50, 63, 80,
-        100, 125, 160, 200, 250, 315, 400, 500,
-        630, 800, 1000, 1250, 1600, 2000, 2500, 3150,
-        4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000
+        31.5f, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000
     };
     private readonly Slider[]    _eqSliders  = new Slider[EqBands];
     private readonly TextBlock[] _eqDbLabels = new TextBlock[EqBands];
@@ -131,7 +132,6 @@ public partial class MainWindow : Window
         BuildEqSliders();
         LoadSchedules();
         LoadMidiCues();
-        RefreshPorts();
         RefreshMidiPorts();
         Loaded += (_, _) => { if (_autoConnect) TryAutoConnect(); };
 
@@ -140,7 +140,26 @@ public partial class MainWindow : Window
         {
             Log("[ERR] Board disconnected");
             SetConnected(false);
+            if (_autoConnect)
+            {
+                Log("[AUTO] Reconnecting…");
+                _reconnectTimer.Start();
+            }
         });
+
+        _reconnectTimer.Interval = TimeSpan.FromSeconds(3);
+        _reconnectTimer.Tick += (_, _) =>
+        {
+            if (_connected) { _reconnectTimer.Stop(); return; }
+            if (_serial.Open())
+            {
+                _reconnectTimer.Stop();
+                SetConnected(true);
+                _beatTimer.Start();
+                _serial.Send("version");
+                Log("[AUTO] Reconnected (HID)");
+            }
+        };
 
         _clockTimer.Interval = TimeSpan.FromSeconds(1);
         _clockTimer.Tick += (_, _) =>
@@ -159,7 +178,7 @@ public partial class MainWindow : Window
 
     // ── Connection ────────────────────────────────────────────────────────────
 
-    private void BtnRefresh_Click(object sender, RoutedEventArgs e) => RefreshPorts();
+    private void BtnRefresh_Click(object sender, RoutedEventArgs e) { /* HID: no ports to refresh */ }
 
     // ── Signal Generator ──────────────────────────────────────────────────────
 
@@ -287,8 +306,8 @@ public partial class MainWindow : Window
         try
         {
             var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(SettingsFile));
-            if (doc.RootElement.TryGetProperty("autoconnect", out var v))
-                _autoConnect = v.GetBoolean();
+            if (doc.RootElement.TryGetProperty("autoconnect", out var ac))
+                _autoConnect = ac.GetBoolean();
         }
         catch { }
         if (TgAutoConnect != null)
@@ -299,24 +318,26 @@ public partial class MainWindow : Window
 
     private void SaveSettings()
     {
-        var json = System.Text.Json.JsonSerializer.Serialize(new { autoconnect = _autoConnect });
+        var json = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            autoconnect = _autoConnect,
+            repeat      = _repeatMode,
+        });
         File.WriteAllText(SettingsFile, json);
     }
 
     private void TryAutoConnect()
     {
-        if (CbPort.Items.Count == 0) return;
-        if (CbPort.SelectedItem is not string port) return;
-        if (_serial.Open(port))
+        if (_serial.Open())
         {
-            File.WriteAllText(LastPortFile, port);
             SetConnected(true);
             _beatTimer.Start();
             _serial.Send("version");
-            Log($"[AUTO] Connected to {port}");
+            _serial.Send("status");
+            Log("[AUTO] Connected (HID)");
         }
         else
-            Log($"[AUTO] Cannot open {port}");
+            Log("[AUTO] PicoAudioCore HID device not found");
     }
 
     private void TgAutoConnect_Click(object sender, RoutedEventArgs e)
@@ -338,42 +359,33 @@ public partial class MainWindow : Window
         }
     }
 
-    private void RefreshPorts()
-    {
-        var ports = SerialService.GetPortNames();
-        CbPort.Items.Clear();
-        foreach (var p in ports) CbPort.Items.Add(p);
-        if (CbPort.Items.Count == 0) return;
-        string last = File.Exists(LastPortFile) ? File.ReadAllText(LastPortFile).Trim() : "";
-        int idx = CbPort.Items.IndexOf(last);
-        CbPort.SelectedIndex = idx >= 0 ? idx : CbPort.Items.Count - 1;
-    }
+    private void RefreshPorts() { /* HID: auto-discovered by VID/PID */ }
 
     private void BtnConnect_Click(object sender, RoutedEventArgs e)
     {
         if (_connected)
         {
+            _reconnectTimer.Stop();
             _beatTimer.Stop();
             _serial.Close();
             SetConnected(false);
             return;
         }
-        if (CbPort.SelectedItem is not string port) return;
-        if (_serial.Open(port))
+        if (_serial.Open())
         {
-            File.WriteAllText(LastPortFile, port);
             SetConnected(true);
             _beatTimer.Start();
             _serial.Send("version");
+            _serial.Send("status");
         }
         else
-            Log($"[ERR] Cannot open {port}");
+            Log("[ERR] PicoAudioCore HID device not found — plug in Pico");
     }
 
     private void SetConnected(bool on)
     {
         _connected = on;
-        if (!on) { _beatTimer.Stop(); TbFirmware.Text = ""; _volumeSync = false; _eqSync = false; _mono = false; UpdateMonoToggleUI(false); }
+        if (!on) { _beatTimer.Stop(); TbFirmware.Text = ""; _volumeSync = false; _eqSync = false; _mono = false; _repeatMode = ""; UpdateMonoToggleUI(false); UpdateModeButtons(); }
         BtnConnect.Content        = on ? "Disconnect" : "Connect";
         StatusDot.Fill            = on ? Brushes.LightGreen : new SolidColorBrush(Color.FromRgb(0xf3,0x8b,0xa8));
         BtnPrev.IsEnabled         = on;
@@ -391,6 +403,7 @@ public partial class MainWindow : Window
         BtnRepeatAll.IsEnabled    = on;
         BtnRepeatOff.IsEnabled    = on;
         BtnRepeatSingle.IsEnabled = on;
+        BtnRepeatRandom.IsEnabled = on;
         BtnAutoPlay.IsEnabled     = on;
         BtnEqReset.IsEnabled      = on;
         foreach (var s in _eqSliders) if (s != null) s.IsEnabled = on;
@@ -408,8 +421,28 @@ public partial class MainWindow : Window
 
     // ── Transport ─────────────────────────────────────────────────────────────
 
-    private void BtnPrev_Click (object sender, RoutedEventArgs e) => _serial.Send("prev");
-    private void BtnNext_Click (object sender, RoutedEventArgs e) => _serial.Send("next");
+    private void BtnPrev_Click(object sender, RoutedEventArgs e)
+    {
+        if (_repeatMode == "rnd" && _totalTracks > 1)
+            _serial.Send($"goto {RandomTrackNum()}");
+        else
+            _serial.Send("prev");
+    }
+
+    private void BtnNext_Click(object sender, RoutedEventArgs e)
+    {
+        if (_repeatMode == "rnd" && _totalTracks > 1)
+            _serial.Send($"goto {RandomTrackNum()}");
+        else
+            _serial.Send("next");
+    }
+
+    private int RandomTrackNum()
+    {
+        int next;
+        do { next = _rng.Next(1, _totalTracks + 1); } while (next == _currentTrack);
+        return next;
+    }
     private void BtnStop_Click (object sender, RoutedEventArgs e) => _serial.Send("stop");
 
     private void BtnPlay_Click(object sender, RoutedEventArgs e)
@@ -438,10 +471,15 @@ public partial class MainWindow : Window
 
     // ── Playback mode ─────────────────────────────────────────────────────────
 
-    private void BtnRepeatOne_Click   (object sender, RoutedEventArgs e) => _serial.Send("mode repeat_one");
-    private void BtnRepeatAll_Click   (object sender, RoutedEventArgs e) => _serial.Send("mode repeat_all");
-    private void BtnRepeatOff_Click   (object sender, RoutedEventArgs e) => _serial.Send("mode repeat_off");
-    private void BtnRepeatSingle_Click(object sender, RoutedEventArgs e) => _serial.Send("mode repeat_single");
+    private void SetRepeatMode(string mode, string cmd)
+    {
+        _repeatMode = mode; SaveSettings(); _serial.Send(cmd); UpdateModeButtons();
+    }
+    private void BtnRepeatOne_Click   (object sender, RoutedEventArgs e) => SetRepeatMode("one",    "mode repeat_one");
+    private void BtnRepeatAll_Click   (object sender, RoutedEventArgs e) => SetRepeatMode("all",    "mode repeat_all");
+    private void BtnRepeatOff_Click   (object sender, RoutedEventArgs e) => SetRepeatMode("off",    "mode repeat_off");
+    private void BtnRepeatSingle_Click(object sender, RoutedEventArgs e) => SetRepeatMode("single", "mode repeat_single");
+    private void BtnRepeatRandom_Click(object sender, RoutedEventArgs e) => SetRepeatMode("rnd",    "mode repeat_random");
     private void BtnAutoPlay_Click    (object sender, RoutedEventArgs e) =>
         _serial.Send(_autoPlay ? "mode autoplay_off" : "mode autoplay_on");
 
@@ -454,11 +492,13 @@ public partial class MainWindow : Window
         BtnRepeatAll.Background    = _repeatMode == "all"    ? BrushActive : BrushInactive;
         BtnRepeatOff.Background    = _repeatMode == "off"    ? BrushActive : BrushInactive;
         BtnRepeatSingle.Background = _repeatMode == "single" ? BrushActive : BrushInactive;
+        BtnRepeatRandom.Background = _repeatMode == "rnd"    ? BrushActive : BrushInactive;
         var dark = new SolidColorBrush(Color.FromRgb(0x0d, 0x14, 0x30));
         BtnRepeatOne.Foreground    = _repeatMode == "one"    ? dark : Brushes.White;
         BtnRepeatAll.Foreground    = _repeatMode == "all"    ? dark : Brushes.White;
         BtnRepeatOff.Foreground    = _repeatMode == "off"    ? dark : Brushes.White;
         BtnRepeatSingle.Foreground = _repeatMode == "single" ? dark : Brushes.White;
+        BtnRepeatRandom.Foreground = _repeatMode == "rnd"    ? dark : Brushes.White;
 
         BtnAutoPlay.Background = _autoPlay ? BrushActive : BrushInactive;
         BtnAutoPlay.Foreground = _autoPlay ? new SolidColorBrush(Color.FromRgb(0x0d,0x14,0x30)) : Brushes.White;
@@ -597,7 +637,7 @@ public partial class MainWindow : Window
         for (int i = 0; i < EqBands; i++)
         {
             int idx = i;
-            var sp = new StackPanel { Width = 26, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(1, 0, 1, 0) };
+            var sp = new StackPanel { Width = 48, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(3, 0, 3, 0) };
 
             var dbLbl = new TextBlock
             {
@@ -640,7 +680,7 @@ public partial class MainWindow : Window
 
     private void BtnEqReset_Click(object sender, RoutedEventArgs e)
     {
-        var r = MessageBox.Show("Reset all 32 EQ bands to flat (0 dB)?",
+        var r = MessageBox.Show("Reset all 10 EQ bands to flat (0 dB)?",
                                 "Confirm Reset", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (r != MessageBoxResult.Yes) return;
         _eqSync = false;
@@ -701,7 +741,11 @@ public partial class MainWindow : Window
         }
 
         if (!string.IsNullOrEmpty(track) && !string.IsNullOrEmpty(total))
+        {
             TbTrackInfo.Text = $"Track {track} / {total}  [{state}]";
+            if (int.TryParse(track, out var tn)) _currentTrack = tn;
+            if (int.TryParse(total, out var tt)) _totalTracks  = tt;
+        }
 
         if (!string.IsNullOrEmpty(file))
         {
@@ -823,7 +867,7 @@ public partial class MainWindow : Window
 
         bool modeChanged = false;
         if (!string.IsNullOrEmpty(repeat) && repeat != _repeatMode)
-        { _repeatMode = repeat; modeChanged = true; }
+        { _repeatMode = repeat; modeChanged = true; SaveSettings(); }
         bool newAuto = autoplay == "on";
         if (!string.IsNullOrEmpty(autoplay) && newAuto != _autoPlay)
         { _autoPlay = newAuto; modeChanged = true; }
@@ -1238,13 +1282,15 @@ public partial class MainWindow : Window
 
     private async System.Threading.Tasks.Task<List<ScheduleEntry>?> PullScheduleFromPico()
     {
-        /* sched list sends:
+        /* sched list sends (new protocol):
          *   SCHED count=N
-         *   SCHED_ENTRY #i enabled=E time=HH:MM stop=SS:MM loops=L days=DDDDDDD file=F
-         *   (×N, then silence)
-         * Collect until we have count lines or 3 s timeout. */
-        int expectedCount = -1;
-        var collected     = new List<ScheduleEntry>();
+         *   SCHED_ENTRY #i en=E ti=HH:MM st=HH:MM lp=N da=DDDDDDD
+         *   SCHED_TRACKS #i tracks_csv
+         *   (×N pairs, then silence)
+         * We wait until we have N entries with tracks filled in, or 5 s timeout. */
+        int expectedCount  = -1;
+        int tracksReceived = 0;
+        var collected      = new List<ScheduleEntry>();
         var tcs = new System.Threading.Tasks.TaskCompletionSource<List<ScheduleEntry>?>(
             System.Threading.Tasks.TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -1263,15 +1309,26 @@ public partial class MainWindow : Window
             {
                 var entry = ParseSchedEntry(line);
                 if (entry != null) collected.Add(entry);
-                if (expectedCount >= 0 && collected.Count >= expectedCount)
-                { _serial.LineReceived -= h; tcs.TrySetResult(collected); }
+            }
+            else if (line.StartsWith("SCHED_TRACKS "))
+            {
+                /* SCHED_TRACKS #i csv */
+                var rest = line["SCHED_TRACKS ".Length..].TrimStart('#');
+                var sp   = rest.IndexOf(' ');
+                if (sp > 0 && int.TryParse(rest[..sp], out int idx) && idx < collected.Count)
+                {
+                    collected[idx].Tracks = rest[(sp + 1)..];
+                    tracksReceived++;
+                    if (expectedCount >= 0 && tracksReceived >= expectedCount)
+                    { _serial.LineReceived -= h; tcs.TrySetResult(collected); }
+                }
             }
         };
 
         _serial.LineReceived += h;
         _serial.Send("sched list");
 
-        using var cts = new System.Threading.CancellationTokenSource(3000);
+        using var cts = new System.Threading.CancellationTokenSource(5000);
         cts.Token.Register(() => { _serial.LineReceived -= h; tcs.TrySetResult(expectedCount < 0 ? null : collected); });
 
         return await tcs.Task;
@@ -1279,7 +1336,8 @@ public partial class MainWindow : Window
 
     private static ScheduleEntry? ParseSchedEntry(string line)
     {
-        /* SCHED_ENTRY #i enabled=E time=HH:MM stop=SS:MM loops=L days=DDDDDDD file=F */
+        /* New:  SCHED_ENTRY #i en=E ti=HH:MM st=HH:MM lp=N da=DDDDDDD
+         * Old:  SCHED_ENTRY #i enabled=E time=HH:MM stop=SS:MM loops=L days=DDDDDDD file=F */
         var e = new ScheduleEntry();
         foreach (var token in line.Split(' '))
         {
@@ -1287,19 +1345,24 @@ public partial class MainWindow : Window
             if (kv.Length != 2) continue;
             switch (kv[0])
             {
-                case "enabled": e.Enabled  = kv[1] == "1"; break;
-                case "time":    e.Time     = kv[1]; break;
-                case "stop":    e.StopTime = kv[1] == "--:--" ? "" : kv[1]; break;
-                case "loops":   e.Loops    = int.TryParse(kv[1], out int l) ? l : 1; break;
+                case "en":
+                case "enabled":  e.Enabled  = kv[1] == "1"; break;
+                case "ti":
+                case "time":     e.Time     = kv[1]; break;
+                case "st":
+                case "stop":     e.StopTime = kv[1] == "--:--" ? "" : kv[1]; break;
+                case "lp":
+                case "loops":    e.Loops    = int.TryParse(kv[1], out int l) ? l : 1; break;
+                case "da":
                 case "days":
                     for (int d = 0; d < 7 && d < kv[1].Length; d++)
                         e.Days[d] = kv[1][d] == '1';
                     break;
-                case "tracks":  e.Tracks   = kv[1]; break;
-                case "file":    e.Tracks   = kv[1]; break;  // backward compat
+                case "tracks":
+                case "file":     e.Tracks   = kv[1]; break;
             }
         }
-        return string.IsNullOrEmpty(e.Tracks) ? null : e;
+        return e;
     }
 
     /* ── Save / Load schedule file ───────────────────────────────────────── */
@@ -1757,6 +1820,7 @@ public partial class MainWindow : Window
         SaveWindowState();
         _clockTimer.Stop();
         _beatTimer.Stop();
+        _reconnectTimer.Stop();
         CloseMidi();
         _serial.Dispose();
         base.OnClosed(e);

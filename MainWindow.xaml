@@ -558,101 +558,15 @@
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="140"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Port:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#cdd6f4"/>
-                <ComboBox  Grid.Row="0" Grid.Column="1" x:Name="CbPort" Height="28" BorderBrush="#45475a">
-                    <ComboBox.Style>
-                        <Style TargetType="ComboBox">
-                            <Setter Property="Background" Value="#1e1e2e"/>
-                            <Setter Property="Foreground" Value="White"/>
-                            <Setter Property="BorderBrush" Value="#45475a"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ComboBox">
-                                        <Grid>
-                                            <Border x:Name="Border" Background="{TemplateBinding Background}"
-                                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                                    BorderThickness="1" CornerRadius="4"/>
-                                            <ContentPresenter x:Name="ContentSite"
-                                                              Content="{TemplateBinding SelectionBoxItem}"
-                                                              Margin="8,0,28,0" VerticalAlignment="Center"
-                                                              HorizontalAlignment="Left"
-                                                              TextElement.Foreground="White"/>
-                                            <ToggleButton Focusable="False"
-                                                          IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                                          ClickMode="Press" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                                <ToggleButton.Style>
-                                                    <Style TargetType="ToggleButton">
-                                                        <Setter Property="OverridesDefaultStyle" Value="True"/>
-                                                        <Setter Property="Background"            Value="Transparent"/>
-                                                        <Setter Property="BorderThickness"       Value="0"/>
-                                                        <Setter Property="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate TargetType="ToggleButton">
-                                                                    <Border Background="Transparent"/>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </Style>
-                                                </ToggleButton.Style>
-                                            </ToggleButton>
-                                            <TextBlock Text="▾" Foreground="White" FontSize="13"
-                                                       HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                       Margin="0,0,8,0" IsHitTestVisible="False"/>
-                                            <Popup x:Name="Popup" Placement="Bottom"
-                                                   IsOpen="{TemplateBinding IsDropDownOpen}"
-                                                   AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
-                                                <Grid MinWidth="{TemplateBinding ActualWidth}" MaxHeight="300">
-                                                    <Border Background="#313244" BorderBrush="#45475a" BorderThickness="1" CornerRadius="4">
-                                                        <ScrollViewer>
-                                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
-                                                        </ScrollViewer>
-                                                    </Border>
-                                                </Grid>
-                                            </Popup>
-                                        </Grid>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                            <Setter Property="ItemContainerStyle">
-                                <Setter.Value>
-                                    <Style TargetType="ComboBoxItem">
-                                        <Setter Property="OverridesDefaultStyle" Value="True"/>
-                                        <Setter Property="Foreground" Value="White"/>
-                                        <Setter Property="Background" Value="#313244"/>
-                                        <Setter Property="Padding"    Value="8,5"/>
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="ComboBoxItem">
-                                                    <Border x:Name="Bd" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
-                                                        <TextBlock Text="{TemplateBinding Content}" Foreground="White" FontSize="13"/>
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsHighlighted" Value="True">
-                                                            <Setter TargetName="Bd" Property="Background" Value="#585b70"/>
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ComboBox.Style>
-                </ComboBox>
-                <Button    Grid.Row="0" Grid.Column="2" x:Name="BtnRefresh" Content="⟳" Style="{StaticResource DarkBtn}" Margin="6,0" Width="32" Click="BtnRefresh_Click"/>
-                <Button    Grid.Row="0" Grid.Column="3" x:Name="BtnConnect" Content="Connect" Style="{StaticResource AccentBtn}" Width="100" Click="BtnConnect_Click"/>
+                <Button    Grid.Row="0" Grid.Column="0" x:Name="BtnConnect" Content="Connect" Style="{StaticResource AccentBtn}" Width="100" Click="BtnConnect_Click"/>
 
                 <!-- Autoconnect toggle -->
-                <ToggleButton Grid.Row="0" Grid.Column="4" x:Name="TgAutoConnect" Click="TgAutoConnect_Click"
+                <ToggleButton Grid.Row="0" Grid.Column="1" x:Name="TgAutoConnect" Click="TgAutoConnect_Click"
                               VerticalAlignment="Center" Margin="12,0,0,0" Padding="10,5"
                               ToolTip="Autoconnect — เชื่อมต่อ COM port ล่าสุดอัตโนมัติเมื่อเปิดแอป">
                     <ToggleButton.Style>
@@ -693,7 +607,7 @@
                 </ToggleButton>
 
                 <!-- Startup on boot toggle -->
-                <ToggleButton Grid.Row="0" Grid.Column="5" x:Name="TgStartup" Click="TgStartup_Click"
+                <ToggleButton Grid.Row="0" Grid.Column="2" x:Name="TgStartup" Click="TgStartup_Click"
                               VerticalAlignment="Center" Margin="8,0,0,0" Padding="10,5"
                               ToolTip="เปิดแอปพร้อม Windows อัตโนมัติ (บันทึกใน Registry HKCU Run)">
                     <ToggleButton.Style>
@@ -733,11 +647,11 @@
                     </StackPanel>
                 </ToggleButton>
 
-                <Ellipse Grid.Row="0" Grid.Column="7" x:Name="StatusDot" Width="12" Height="12"
+                <Ellipse Grid.Row="0" Grid.Column="4" x:Name="StatusDot" Width="12" Height="12"
                          Fill="#f38ba8" Margin="12,0,0,0" VerticalAlignment="Center"/>
 
                 <!-- Row 1: firmware version + quick controls + send file -->
-                <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="8"
+                <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5"
                             Orientation="Horizontal" Margin="0,6,0,0">
                     <TextBlock x:Name="TbFirmware" Text="" Foreground="#6c7086" FontSize="12"
                                VerticalAlignment="Center"/>
@@ -842,7 +756,8 @@
                                     <Button x:Name="BtnRepeatOne"    Content="⟳  One"    Style="{StaticResource DarkBtn}" Width="90" Margin="0,0,6,0" IsEnabled="False" Click="BtnRepeatOne_Click"/>
                                     <Button x:Name="BtnRepeatAll"    Content="⟳  All"    Style="{StaticResource DarkBtn}" Width="90" Margin="0,0,6,0" IsEnabled="False" Click="BtnRepeatAll_Click"/>
                                     <Button x:Name="BtnRepeatOff"    Content="✕  Off"    Style="{StaticResource DarkBtn}" Width="90" Margin="0,0,6,0" IsEnabled="False" Click="BtnRepeatOff_Click"/>
-                                    <Button x:Name="BtnRepeatSingle" Content="1  Single" Style="{StaticResource DarkBtn}" Width="90" Margin="0,0,0,0" IsEnabled="False" Click="BtnRepeatSingle_Click"/>
+                                    <Button x:Name="BtnRepeatSingle" Content="1  Single" Style="{StaticResource DarkBtn}" Width="90" Margin="0,0,6,0" IsEnabled="False" Click="BtnRepeatSingle_Click"/>
+                                    <Button x:Name="BtnRepeatRandom" Content="🎲 Random" Style="{StaticResource DarkBtn}" Width="90" Margin="0,0,0,0" IsEnabled="False" Click="BtnRepeatRandom_Click"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="AutoPlay:" VerticalAlignment="Center" Foreground="#a6adc8" Width="60"/>
@@ -902,7 +817,7 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
-                                <TextBlock Text="32-Band EQ" Foreground="#a6adc8" FontSize="13"
+                                <TextBlock Text="10-Band EQ" Foreground="#a6adc8" FontSize="13"
                                            VerticalAlignment="Center" Margin="0,0,12,0"/>
                                 <Button x:Name="BtnEqReset" Content="Flat Reset" Style="{StaticResource DarkBtn}"
                                         FontSize="13" Padding="8,3" IsEnabled="False" Click="BtnEqReset_Click"/>
@@ -1467,7 +1382,7 @@
                         <!-- ── EQ ── -->
                         <TextBlock Text="แท็บ EQ" Foreground="#89b4fa" FontSize="13" FontWeight="Bold" Margin="0,0,0,6"/>
                         <TextBlock TextWrapping="Wrap" Foreground="#cdd6f4" FontSize="13" Margin="0,0,0,4">
-                            EQ 32 band — ปรับ slider แต่ละ band ได้ตั้งแต่ −12 dB ถึง +12 dB
+                            EQ 10 band — ปรับ slider แต่ละ band ได้ตั้งแต่ −12 dB ถึง +12 dB
                         </TextBlock>
                         <Grid Margin="0,4,0,4">
                             <Grid.ColumnDefinitions>
@@ -1541,12 +1456,12 @@
 
                                 <TextBlock Text="Volume &amp; EQ" Foreground="#6c7086" FontSize="13" Margin="0,12,0,6"/>
                                 <TextBlock FontFamily="Consolas" FontSize="13" Foreground="#cdd6f4" TextWrapping="Wrap">
-                                    <Run Foreground="#a6e3a1">volume</Run> <Run Foreground="#fab387">&lt;0-100&gt;</Run>&#10;<Run Foreground="#a6e3a1">eq band</Run> <Run Foreground="#fab387">&lt;0-31&gt; &lt;-12..12&gt;</Run>&#10;<Run Foreground="#a6e3a1">eq reset</Run>&#10;<Run Foreground="#a6e3a1">mono on</Run>|<Run Foreground="#a6e3a1">off</Run>
+                                    <Run Foreground="#a6e3a1">volume</Run> <Run Foreground="#fab387">&lt;0-100&gt;</Run>&#10;<Run Foreground="#a6e3a1">eq band</Run> <Run Foreground="#fab387">&lt;0-9&gt; &lt;-12..12&gt;</Run>&#10;<Run Foreground="#a6e3a1">eq reset</Run>&#10;<Run Foreground="#a6e3a1">mono on</Run>|<Run Foreground="#a6e3a1">off</Run>
                                 </TextBlock>
 
                                 <TextBlock Text="Repeat Mode" Foreground="#6c7086" FontSize="13" Margin="0,12,0,6"/>
                                 <TextBlock FontFamily="Consolas" FontSize="13" Foreground="#cdd6f4" TextWrapping="Wrap">
-                                    <Run Foreground="#a6e3a1">mode repeat_one</Run>      — วนซ้ำ track เดิม&#10;<Run Foreground="#a6e3a1">mode repeat_all</Run>      — วนทุก track&#10;<Run Foreground="#a6e3a1">mode repeat_off</Run>      — ไม่วน&#10;<Run Foreground="#a6e3a1">mode repeat_single</Run>   — เล่น track เดียวแล้วหยุด&#10;<Run Foreground="#a6e3a1">mode autoplay_on</Run>|<Run Foreground="#a6e3a1">off</Run>  — เล่นอัตโนมัติตอน boot
+                                    <Run Foreground="#a6e3a1">mode repeat_one</Run>      — วนซ้ำ track เดิม&#10;<Run Foreground="#a6e3a1">mode repeat_all</Run>      — วนทุก track&#10;<Run Foreground="#a6e3a1">mode repeat_off</Run>      — ไม่วน&#10;<Run Foreground="#a6e3a1">mode repeat_single</Run>   — เล่น track เดียวแล้วหยุด&#10;<Run Foreground="#a6e3a1">mode repeat_random</Run>   — สุ่ม track ถัดไป (TRNG)&#10;<Run Foreground="#a6e3a1">mode autoplay_on</Run>|<Run Foreground="#a6e3a1">off</Run>  — เล่นอัตโนมัติตอน boot
                                 </TextBlock>
 
                                 <TextBlock Text="Date / Time" Foreground="#6c7086" FontSize="13" Margin="0,12,0,6"/>
@@ -1655,7 +1570,7 @@
                                    Foreground="#cdd6f4" LineHeight="22" Margin="0,0,0,20">
                             PicoAudioCore คือระบบเล่นเสียงดิจิทัล In-house สร้างบน Raspberry Pi Pico 2 (RP2350)
                             รองรับ MP3 / WAV / FLAC ออกเสียงผ่าน MCP4922 12-bit DAC แยกชิป
-                            พร้อม 32-band EQ, Scheduler อัตโนมัติ และควบคุมผ่าน PC GUI นี้
+                            พร้อม 10-band EQ, Scheduler อัตโนมัติ และควบคุมผ่าน PC GUI นี้
                         </TextBlock>
 
                         <Separator Background="#383858" Margin="0,0,0,20"/>
@@ -1690,7 +1605,7 @@
                             <TextBlock Grid.Row="2" Grid.Column="1" Text="FreeRTOS SMP  (2 cores)" Foreground="#cdd6f4" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
 
                             <TextBlock Grid.Row="3" Grid.Column="0" Text="DSP / EQ" Foreground="#6c7086" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
-                            <TextBlock Grid.Row="3" Grid.Column="1" Text="CMSIS-DSP  ·  32-band Peaking Biquad  ±12 dB" Foreground="#cdd6f4" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="CMSIS-DSP  ·  10-band Peaking Biquad  ±12 dB" Foreground="#cdd6f4" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
 
                             <TextBlock Grid.Row="4" Grid.Column="0" Text="Formats" Foreground="#6c7086" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
                             <TextBlock Grid.Row="4" Grid.Column="1" Text="MP3 (minimp3)  ·  WAV 8/16-bit  ·  FLAC ≤48 kHz (dr_flac)" Foreground="#cdd6f4" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
@@ -1779,7 +1694,7 @@
                             <StackPanel>
                                 <TextBlock Text="v2.0" Foreground="#a6e3a1" FontFamily="Consolas" FontSize="13" FontWeight="Bold" Margin="0,0,0,6"/>
                                 <TextBlock FontFamily="Consolas" FontSize="12" Foreground="#585b70" LineHeight="20" TextWrapping="Wrap">
-                                    32-band EQ, Schedule Editor (Pico + GUI mode), Autoconnect, Run on Startup
+                                    10-band EQ, Schedule Editor (Pico + GUI mode), Autoconnect, Run on Startup
                                 </TextBlock>
                             </StackPanel>
                         </Border>
