@@ -1569,7 +1569,7 @@
                         <TextBlock Text="SonoPilot" FontSize="28" FontWeight="Bold"
                                    Foreground="#cba6f7" FontFamily="Consolas" Margin="0,0,0,4"/>
                         <TextBlock FontFamily="Consolas" FontSize="13" Foreground="#6c7086" Margin="0,0,0,20">
-                            <Run Text="PC GUI  v3.5   ·   Firmware v1.7   ·   © 2025 fildsady"/>
+                            <Run Text="PC GUI  v3.5   ·   Firmware v2.0   ·   © 2025 fildsady"/>
                         </TextBlock>
 
                         <Separator Background="#383858" Margin="0,0,0,20"/>
@@ -1652,7 +1652,7 @@
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="PC GUI" Foreground="#6c7086" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
                             <TextBlock Grid.Row="0" Grid.Column="1" Text="v3.5" Foreground="#a6e3a1" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="Firmware" Foreground="#6c7086" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="v1.7" Foreground="#a6e3a1" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="v2.0" Foreground="#a6e3a1" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Repository" Foreground="#6c7086" FontFamily="Consolas" FontSize="13" Margin="0,3"/>
                             <TextBlock Grid.Row="2" Grid.Column="1" FontFamily="Consolas" FontSize="13" Margin="0,3">
                                 <Hyperlink NavigateUri="https://github.com/fildsady/sonopilot-pc"

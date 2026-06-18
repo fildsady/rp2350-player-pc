@@ -3,7 +3,7 @@
 แอปพลิเคชัน WPF (.NET 10, Windows) สำหรับควบคุม **SonoPilot Firmware** บน Raspberry Pi Pico 2 ผ่าน USB HID  
 รองรับการควบคุม Playback, EQ, Scheduler, Signal Generator, MIDI CUE และการจัดการไฟล์บน SD card
 
-เฟิร์มแวร์ที่รองรับ: **[SonoPilot Firmware v1.7+](https://github.com/fildsady/sonopilot-firmware)**
+เฟิร์มแวร์ที่รองรับ: **[SonoPilot Firmware v2.0+](https://github.com/fildsady/sonopilot-firmware)**
 
 ---
 
@@ -29,7 +29,7 @@
 
 - Windows 10/11 (64-bit)
 - [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) (หรือ SDK สำหรับ build)
-- SonoPilot Firmware v1.7+ เชื่อมต่อผ่าน USB
+- SonoPilot Firmware v2.0+ เชื่อมต่อผ่าน USB
 - (Optional) [loopMIDI](https://www.tobias-erichsen.de/software/loopmidi.html) — สำหรับรับ MIDI จาก DAW
 
 ---
