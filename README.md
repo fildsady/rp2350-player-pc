@@ -60,8 +60,8 @@ dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=
 ### เชื่อมต่อ
 
 1. เสียบ Pico 2 ผ่าน USB
-2. เลือก COM port จาก dropdown
-3. คลิก **Connect** — หรือเปิด **Autoconnect** ให้ต่ออัตโนมัติทุกครั้งที่เปิดแอป
+2. คลิก **Connect** — GUI ค้นหา Pico ผ่าน USB HID (VID `0x2E8A` / PID `0xC0DE`) อัตโนมัติ ไม่ต้องเลือก port
+3. หรือเปิด **Autoconnect** ให้ต่ออัตโนมัติทุกครั้งที่เปิดแอป
 
 เมื่อเชื่อมต่อสำเร็จ GUI จะส่ง `status` ทันทีเพื่อดึงสถานะปัจจุบัน (repeat mode, ระดับเสียง, track ที่กำลังเล่น) มาแสดงผลโดยไม่ต้องรอ poll รอบถัดไป
 
@@ -205,7 +205,7 @@ CUE list บันทึกอัตโนมัติเป็น `midicues.jso
 | `hotkeys.json` | Hotkey ที่กำหนดเอง |
 | `midicues.json` | MIDI CUE list |
 | `schedules.json` | Schedule ล่าสุดที่แก้ไขใน GUI |
-| `lastport.txt` | COM port ล่าสุดที่ใช้ |
+| `lastport.txt` | *(ไม่ได้ใช้งาน — HID ค้นหาอัตโนมัติ)* |
 | `windowstate.json` | ตำแหน่งและขนาดหน้าต่าง |
 
 ---

@@ -568,7 +568,7 @@
                 <!-- Autoconnect toggle -->
                 <ToggleButton Grid.Row="0" Grid.Column="1" x:Name="TgAutoConnect" Click="TgAutoConnect_Click"
                               VerticalAlignment="Center" Margin="12,0,0,0" Padding="10,5"
-                              ToolTip="Autoconnect — เชื่อมต่อ COM port ล่าสุดอัตโนมัติเมื่อเปิดแอป">
+                              ToolTip="Autoconnect — ค้นหา Pico ผ่าน USB HID และเชื่อมต่ออัตโนมัติเมื่อเปิดแอป">
                     <ToggleButton.Style>
                         <Style TargetType="ToggleButton">
                             <Setter Property="Background" Value="#1e1e2e"/>
@@ -1341,7 +1341,7 @@
                         <!-- ── Connection ── -->
                         <TextBlock Text="การเชื่อมต่อ" Foreground="#89b4fa" FontSize="13" FontWeight="Bold" Margin="0,0,0,6"/>
                         <TextBlock TextWrapping="Wrap" Foreground="#a6adc8" FontSize="13" Margin="0,0,0,4">
-                            1. เสียบ Pico 2 ผ่าน USB&#10;2. เลือก COM port จาก dropdown ด้านบน&#10;3. คลิก Connect — สถานะจะเปลี่ยนเป็นสีเขียวเมื่อเชื่อมต่อสำเร็จ
+                            1. เสียบ Pico 2 ผ่าน USB&#10;2. คลิก Connect — GUI ค้นหา Pico ผ่าน USB HID (VID/PID) อัตโนมัติ ไม่ต้องเลือก port&#10;3. สถานะจะเปลี่ยนเป็นสีเขียวเมื่อเชื่อมต่อสำเร็จ
                         </TextBlock>
 
                         <Rectangle Height="1" Fill="#313244" Margin="0,12,0,12"/>
@@ -1540,7 +1540,7 @@
                                 • ค่า EQ และ volume บันทึกลง SD อัตโนมัติเมื่อเปลี่ยน
                             </TextBlock>
                             <TextBlock TextWrapping="Wrap" Foreground="#a6adc8" FontSize="13" Margin="0,0,0,5">
-                                • ถ้า port ไม่ขึ้น ให้กด Refresh หรือถอด-เสียบ USB ใหม่
+                                • ถ้าเชื่อมต่อไม่ได้ ให้ถอด-เสียบ USB ใหม่แล้วกด Connect อีกครั้ง — ไม่มี port ให้เลือก GUI ค้นหา HID อัตโนมัติ
                             </TextBlock>
                             <TextBlock TextWrapping="Wrap" Foreground="#a6adc8" FontSize="13" Margin="0,0,0,5">
                                 • โหมด 🎲 Random จะสุ่ม track ถัดไปด้วย RP2350 hardware TRNG — ปุ่ม Prev/Next ในโหมดนี้จะสุ่มแทนการเลื่อนตามลำดับ
